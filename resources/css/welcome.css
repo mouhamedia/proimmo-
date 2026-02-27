@@ -1,0 +1,14 @@
+/* Animation et styles pour la page d'accueil */
+.animate-float { animation: float 6s ease-in-out infinite; }
+.animate-float-delay { animation: float 6s ease-in-out infinite; animation-delay: 2s; }
+.animate-float-delay-2 { animation: float 6s ease-in-out infinite; animation-delay: 4s; }
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-20px); }
+}
+.gradient-text {
+    background: linear-gradient(135deg, #2563eb 0%, #7c3aed 50%, #4f46e5 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}

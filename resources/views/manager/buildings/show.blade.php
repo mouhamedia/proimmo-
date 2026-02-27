@@ -1,0 +1,582 @@
+@extends('layouts.app')
+
+@section('page-title', $building->name)
+
+@section('breadcrumb')
+    <a href="{{ route('buildings.index') }}" style="color:#8B8FA8;text-decoration:none;transition:color 0.2s;"
+       onmouseover="this.style.color='#1A1A2E'" onmouseout="this.style.color='#8B8FA8'">Immeubles</a>
+    &nbsp;/&nbsp;<span style="color:#1A1A2E;font-weight:600;">{{ $building->name }}</span>
+@endsection
+
+@section('content')
+<style>
+    /* ── Hero ── */
+    .building-hero {
+        background: #1A1A2E;
+        border-radius: 16px;
+        padding: 30px 32px;
+        margin-bottom: 24px;
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 20px;
+        flex-wrap: wrap;
+    }
+    .building-hero::before {
+        content: '';
+        position: absolute; top: -70px; right: -70px;
+        width: 260px; height: 260px;
+        background: #C9A96E; opacity: 0.06;
+        border-radius: 50%; pointer-events: none;
+    }
+    .building-hero::after {
+        content: '';
+        position: absolute; bottom: -40px; left: 40%;
+        width: 160px; height: 160px;
+        background: #C9A96E; opacity: 0.04;
+        border-radius: 50%; pointer-events: none;
+    }
+    .hero-left { position: relative; z-index: 1; }
+    .hero-eyebrow {
+        font-size: 10px; font-weight: 700;
+        letter-spacing: 2.5px; text-transform: uppercase;
+        color: #C9A96E; margin-bottom: 10px;
+        display: flex; align-items: center; gap: 7px;
+    }
+    .hero-name {
+        font-family: 'Playfair Display', serif;
+        font-size: 26px; font-weight: 600;
+        color: #fff; margin-bottom: 7px; line-height: 1.2;
+    }
+    .hero-address {
+        display: flex; align-items: center; gap: 6px;
+        font-size: 13px; color: rgba(255,255,255,0.4);
+    }
+    .hero-address svg { color: #C9A96E; flex-shrink: 0; }
+    .hero-stats {
+        display: flex; gap: 10px;
+        position: relative; z-index: 1; flex-wrap: wrap;
+    }
+    .hero-stat {
+        background: rgba(255,255,255,0.06);
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 10px;
+        padding: 12px 18px;
+        text-align: center; min-width: 80px;
+    }
+    .hero-stat-val {
+        font-family: 'Playfair Display', serif;
+        font-size: 22px; font-weight: 600;
+        color: #C9A96E; line-height: 1; margin-bottom: 3px;
+    }
+    .hero-stat-lbl { font-size: 10px; color: rgba(255,255,255,0.35); white-space: nowrap; }
+
+    /* ── Actions ── */
+    .page-actions {
+        display: flex; gap: 10px;
+        margin-bottom: 24px; flex-wrap: wrap;
+    }
+    .btn-edit {
+        display: inline-flex; align-items: center; gap: 7px;
+        height: 38px; padding: 0 18px;
+        background: #1A1A2E; color: #C9A96E;
+        border: 1px solid #C9A96E; border-radius: 8px;
+        font-size: 13px; font-weight: 600;
+        font-family: 'DM Sans', sans-serif;
+        text-decoration: none; transition: all 0.2s;
+    }
+    .btn-edit:hover { background: #C9A96E; color: #1A1A2E; }
+    .btn-outline {
+        display: inline-flex; align-items: center; gap: 7px;
+        height: 38px; padding: 0 18px;
+        background: transparent; color: #1A1A2E;
+        border: 1.5px solid #E5E3DF; border-radius: 8px;
+        font-size: 13px; font-weight: 600;
+        font-family: 'DM Sans', sans-serif;
+        text-decoration: none; transition: all 0.2s;
+    }
+    .btn-outline:hover { border-color: #C9A96E; color: #C9A96E; }
+
+    /* ── Layout ── */
+    .detail-layout {
+        display: grid;
+        grid-template-columns: 1fr 300px;
+        gap: 20px; align-items: start;
+    }
+    @media (max-width: 920px) { .detail-layout { grid-template-columns: 1fr; } }
+
+    /* ── Cards ── */
+    .card {
+        background: #fff; border: 1px solid #EEECEA;
+        border-radius: 14px; overflow: hidden; margin-bottom: 20px;
+    }
+    .card:last-child { margin-bottom: 0; }
+    .card-head {
+        padding: 16px 22px; border-bottom: 1px solid #EEECEA;
+        display: flex; align-items: center;
+        justify-content: space-between; gap: 10px;
+    }
+    .card-head-left { display: flex; align-items: center; gap: 10px; }
+    .card-ico {
+        width: 30px; height: 30px; background: #F8F7F5;
+        border-radius: 7px; display: flex;
+        align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .card-ico svg { color: #C9A96E; }
+    .card-title { font-size: 14px; font-weight: 700; color: #1A1A2E; }
+    .card-count {
+        font-size: 11px; color: #8B8FA8;
+        background: #F8F7F5; padding: 2px 8px; border-radius: 20px;
+    }
+    .card-link {
+        font-size: 12px; font-weight: 600; color: #C9A96E;
+        text-decoration: none; transition: color 0.2s;
+    }
+    .card-link:hover { color: #A88A50; }
+
+    .card-body { padding: 22px; }
+
+    /* ── Info grid ── */
+    .info-grid {
+        display: grid; grid-template-columns: 1fr 1fr; gap: 18px;
+        margin-bottom: 20px;
+    }
+    @media (max-width: 600px) { .info-grid { grid-template-columns: 1fr; } }
+    .info-lbl {
+        font-size: 10px; font-weight: 700;
+        letter-spacing: 1.5px; text-transform: uppercase;
+        color: #8B8FA8; margin-bottom: 5px;
+    }
+    .info-val { font-size: 14px; font-weight: 600; color: #1A1A2E; }
+
+    /* ── Occupancy bar ── */
+    .occ-label {
+        display: flex; justify-content: space-between;
+        font-size: 12px; margin-bottom: 7px;
+    }
+    .occ-label span:first-child { color: #6B7280; }
+    .occ-label span:last-child  { font-weight: 700; color: #1A1A2E; }
+    .occ-track {
+        height: 8px; background: #F0EEEB;
+        border-radius: 10px; overflow: hidden;
+    }
+    .occ-fill {
+        height: 100%; border-radius: 10px;
+        background: linear-gradient(90deg, #C9A96E, #D4B87A);
+        transition: width 0.6s ease;
+    }
+
+    /* ── Table ── */
+    table { width: 100%; border-collapse: collapse; }
+    thead th {
+        padding: 10px 18px; text-align: left;
+        font-size: 10px; font-weight: 700;
+        letter-spacing: 1.5px; text-transform: uppercase;
+        color: #8B8FA8; background: #F8F7F5;
+        border-bottom: 1px solid #EEECEA;
+    }
+    tbody tr {
+        border-bottom: 1px solid #F5F3F1; transition: background 0.12s;
+    }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: #FAFAF9; }
+    tbody td {
+        padding: 12px 18px; font-size: 13px;
+        color: #1A1A2E; vertical-align: middle;
+    }
+    .apt-num {
+        font-family: 'Courier New', monospace; font-size: 13px;
+        font-weight: 700; background: #F8F7F5; border: 1px solid #E5E3DF;
+        border-radius: 5px; padding: 2px 8px; letter-spacing: 1px;
+    }
+    .type-tag {
+        background: #EFF6FF; color: #2563EB;
+        font-size: 11px; font-weight: 600;
+        padding: 2px 9px; border-radius: 20px; display: inline-block;
+    }
+    .rent-val { font-weight: 600; }
+    .rent-cur { font-size: 11px; color: #8B8FA8; margin-left: 2px; }
+    .status-badge {
+        display: inline-flex; align-items: center; gap: 4px;
+        font-size: 11px; font-weight: 600;
+        padding: 3px 9px; border-radius: 20px;
+    }
+    .status-badge .dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+    .s-occ { background: #ECFDF5; color: #059669; }
+    .s-vac { background: #FEF3C7; color: #D97706; }
+    .s-trv { background: #FEF2F2; color: #DC2626; }
+    .s-def { background: #F3F4F6; color: #6B7280; }
+    .act-btn {
+        width: 28px; height: 28px; border: none; border-radius: 6px;
+        cursor: pointer; display: inline-flex;
+        align-items: center; justify-content: center;
+        transition: all 0.15s; text-decoration: none;
+        background: #FEF3C7; color: #D97706;
+    }
+    .act-btn:hover { background: #FDE68A; }
+
+    /* ── Sidebar ── */
+    .side-card {
+        background: #fff; border: 1px solid #EEECEA;
+        border-radius: 12px; overflow: hidden; margin-bottom: 14px;
+    }
+    .side-card:last-child { margin-bottom: 0; }
+    .side-head {
+        padding: 13px 18px; border-bottom: 1px solid #EEECEA;
+        font-size: 12px; font-weight: 700; color: #1A1A2E;
+    }
+    .side-body { padding: 16px 18px; }
+    .meta-row {
+        display: flex; justify-content: space-between; align-items: flex-start;
+        padding: 8px 0; border-bottom: 1px solid #F5F3F1;
+        font-size: 12px; gap: 10px;
+    }
+    .meta-row:last-child { border-bottom: none; padding-bottom: 0; }
+    .meta-lbl { color: #8B8FA8; flex-shrink: 0; }
+    .meta-val { font-weight: 600; color: #1A1A2E; text-align: right; }
+
+    /* Floor viz */
+    .floor-viz {
+        display: flex; flex-direction: column-reverse;
+        gap: 3px; margin-bottom: 8px;
+    }
+    .floor-bar {
+        height: 12px; border-radius: 3px;
+        background: linear-gradient(90deg, #C9A96E, #D4B87A);
+        align-self: center;
+    }
+    .floor-lbl { font-size: 11px; color: #8B8FA8; text-align: center; }
+
+    /* Danger */
+    .danger-zone {
+        background: #FEF2F2; border: 1px solid #FEE2E2;
+        border-radius: 12px; padding: 14px 16px;
+    }
+    .danger-title { font-size: 12px; font-weight: 700; color: #991B1B; margin-bottom: 4px; }
+    .danger-desc  { font-size: 11px; color: #B91C1C; line-height: 1.5; margin-bottom: 10px; }
+    .btn-danger {
+        width: 100%; height: 34px;
+        background: transparent; color: #DC2626;
+        border: 1.5px solid #DC2626; border-radius: 7px;
+        font-size: 11px; font-weight: 600;
+        font-family: 'DM Sans', sans-serif; cursor: pointer;
+        display: flex; align-items: center; justify-content: center; gap: 5px;
+        transition: all 0.2s;
+    }
+    .btn-danger:hover { background: #DC2626; color: #fff; }
+
+    /* Empty */
+    .empty-row td {
+        padding: 40px; text-align: center;
+        color: #8B8FA8; font-size: 13px;
+    }
+</style>
+
+{{-- ══ HERO ══ --}}
+<div class="building-hero">
+    <div class="hero-left">
+        <div class="hero-eyebrow">
+            <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16"/>
+            </svg>
+            Immeuble
+        </div>
+        <div class="hero-name">{{ $building->name }}</div>
+        <div class="hero-address">
+            <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+            </svg>
+            {{ $building->address }}
+        </div>
+    </div>
+
+    <div class="hero-stats">
+        <div class="hero-stat">
+            <div class="hero-stat-val">{{ $building->apartments_count }}</div>
+            <div class="hero-stat-lbl">Appartements</div>
+        </div>
+        <div class="hero-stat">
+            <div class="hero-stat-val">{{ $building->occupied_count }}</div>
+            <div class="hero-stat-lbl">Occupés</div>
+        </div>
+        <div class="hero-stat">
+            <div class="hero-stat-val">{{ $building->floors }}</div>
+            <div class="hero-stat-lbl">Étages</div>
+        </div>
+        <div class="hero-stat">
+            <div class="hero-stat-val">{{ $building->occupation_rate }}%</div>
+            <div class="hero-stat-lbl">Taux occup.</div>
+        </div>
+    </div>
+</div>
+
+{{-- ══ ACTIONS ══ --}}
+<div class="page-actions">
+    <a href="{{ route('buildings.edit', $building->id) }}" class="btn-edit">
+        <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+        </svg>
+        Modifier l'immeuble
+    </a>
+    <a href="{{ route('manager.apartments.create', ['building_id' => $building->id]) }}" class="btn-outline">
+        <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/>
+        </svg>
+        Ajouter un appartement
+    </a>
+</div>
+
+{{-- ══ LAYOUT ══ --}}
+<div class="detail-layout">
+
+    {{-- MAIN --}}
+    <div>
+
+        {{-- Infos générales --}}
+        <div class="card">
+            <div class="card-head">
+                <div class="card-head-left">
+                    <div class="card-ico">
+                        <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                    <span class="card-title">Informations générales</span>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="info-grid">
+                    <div>
+                        <div class="info-lbl">Nom</div>
+                        <div class="info-val">{{ $building->name }}</div>
+                    </div>
+                    <div>
+                        <div class="info-lbl">Adresse</div>
+                        <div class="info-val">{{ $building->address }}</div>
+                    </div>
+                    <div>
+                        <div class="info-lbl">Nombre d'étages</div>
+                        <div class="info-val">{{ $building->floors }} étage(s)</div>
+                    </div>
+                    <div>
+                        <div class="info-lbl">Date de création</div>
+                        <div class="info-val">{{ $building->created_at->format('d/m/Y') }}</div>
+                    </div>
+                    <div>
+                        <div class="info-lbl">Loyer total / mois</div>
+                        <div class="info-val" style="color:#C9A96E;">
+                            {{ number_format($building->total_rent, 0, ',', ' ') }} FCFA
+                        </div>
+                    </div>
+                    <div>
+                        <div class="info-lbl">Loyer moyen</div>
+                        <div class="info-val">
+                            {{ number_format($building->average_rent, 0, ',', ' ') }} FCFA
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Barre d'occupation --}}
+                <div class="occ-label">
+                    <span>Taux d'occupation</span>
+                    <span>{{ $building->occupied_count }} / {{ $building->apartments_count }} appartements</span>
+                </div>
+                <div class="occ-track">
+                    <div class="occ-fill" style="width:{{ $building->occupation_rate }}%"></div>
+                </div>
+            </div>
+        </div>
+
+        {{-- Table appartements --}}
+        <div class="card">
+            <div class="card-head">
+                <div class="card-head-left">
+                    <div class="card-ico">
+                        <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                        </svg>
+                    </div>
+                    <span class="card-title">Appartements</span>
+                    <span class="card-count">{{ $building->apartments_count }}</span>
+                </div>
+                <a href="{{ route('manager.apartments.create', ['building_id' => $building->id]) }}"
+                   style="display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;color:#C9A96E;text-decoration:none;">
+                    <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/>
+                    </svg>
+                    Ajouter
+                </a>
+            </div>
+
+            @if($building->apartments->isEmpty())
+                <div style="text-align:center;padding:48px 20px;">
+                    <div style="width:48px;height:48px;background:#F8F7F5;border-radius:12px;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;">
+                        <svg width="22" height="22" fill="none" stroke="#8B8FA8" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+                                d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                        </svg>
+                    </div>
+                    <div style="font-size:14px;font-weight:700;color:#1A1A2E;margin-bottom:4px;">Aucun appartement</div>
+                    <div style="font-size:12px;color:#8B8FA8;margin-bottom:16px;">Ajoutez le premier appartement de cet immeuble.</div>
+                    <a href="{{ route('manager.apartments.create', ['building_id' => $building->id]) }}"
+                       style="display:inline-flex;align-items:center;gap:7px;background:#1A1A2E;color:#C9A96E;border:1px solid #C9A96E;border-radius:8px;padding:8px 18px;font-size:13px;font-weight:600;text-decoration:none;">
+                        <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/>
+                        </svg>
+                        Ajouter un appartement
+                    </a>
+                </div>
+            @else
+                <div style="overflow-x:auto;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Numéro</th>
+                                <th>Type</th>
+                                <th>Loyer</th>
+                                <th>Statut</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($building->apartments as $apartment)
+                                @php
+                                    $st = strtolower($apartment->status ?? '');
+                                    $sc = match(true) {
+                                        str_contains($st, 'occup')   => 's-occ',
+                                        str_contains($st, 'vacant')  => 's-vac',
+                                        str_contains($st, 'travaux') => 's-trv',
+                                        default                      => 's-def',
+                                    };
+                                @endphp
+                                <tr>
+                                    <td><span class="apt-num">{{ $apartment->number }}</span></td>
+                                    <td><span class="type-tag">{{ $apartment->type }}</span></td>
+                                    <td>
+                                        <span class="rent-val">{{ number_format($apartment->rent_amount, 0, ',', ' ') }}</span>
+                                        <span class="rent-cur">FCFA</span>
+                                    </td>
+                                    <td>
+                                        <span class="status-badge {{ $sc }}">
+                                            <span class="dot"></span>
+                                            {{ ucfirst($apartment->status ?? '—') }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <a href="{{ route('manager.apartments.edit', $apartment->id) }}"
+                                           class="act-btn" title="Modifier">
+                                            <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                            </svg>
+                                        </a>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            @endif
+        </div>
+
+    </div>
+
+    {{-- SIDEBAR --}}
+    <div>
+
+        {{-- Résumé --}}
+        <div class="side-card">
+            <div class="side-head">📊 Résumé</div>
+            <div class="side-body">
+                <div class="meta-row">
+                    <span class="meta-lbl">Total appartements</span>
+                    <span class="meta-val">{{ $building->apartments_count }}</span>
+                </div>
+                <div class="meta-row">
+                    <span class="meta-lbl">Occupés</span>
+                    <span class="meta-val" style="color:#059669;">{{ $building->occupied_count }}</span>
+                </div>
+                <div class="meta-row">
+                    <span class="meta-lbl">Vacants</span>
+                    <span class="meta-val" style="color:#D97706;">{{ $building->vacant_count }}</span>
+                </div>
+                <div class="meta-row">
+                    <span class="meta-lbl">En travaux</span>
+                    <span class="meta-val" style="color:#DC2626;">{{ $building->work_count }}</span>
+                </div>
+                <div class="meta-row">
+                    <span class="meta-lbl">Revenus / mois</span>
+                    <span class="meta-val" style="color:#C9A96E;">
+                        {{ number_format($building->total_rent, 0, ',', ' ') }} FCFA
+                    </span>
+                </div>
+                <div class="meta-row">
+                    <span class="meta-lbl">Taux d'occupation</span>
+                    <span class="meta-val">{{ $building->occupation_rate }}%</span>
+                </div>
+            </div>
+        </div>
+
+        {{-- Structure --}}
+        <div class="side-card">
+            <div class="side-head">🏢 Structure</div>
+            <div class="side-body">
+                @php $floors = min((int) $building->floors, 8); @endphp
+                <div class="floor-viz">
+                    @for($i = 0; $i < 8; $i++)
+                        @php $w = 52 + ((8 - $i - 1) / 8) * 38; @endphp
+                        <div class="floor-bar"
+                             style="width:{{ $w }}%;opacity:{{ $i < $floors ? '1' : '0.1' }}">
+                        </div>
+                    @endfor
+                </div>
+                <div class="floor-lbl">{{ $building->floors }} étage(s)</div>
+            </div>
+        </div>
+
+        {{-- Historique --}}
+        <div class="side-card">
+            <div class="side-head">🗓 Historique</div>
+            <div class="side-body">
+                <div class="meta-row">
+                    <span class="meta-lbl">Créé le</span>
+                    <span class="meta-val">{{ $building->created_at->format('d/m/Y') }}</span>
+                </div>
+                <div class="meta-row">
+                    <span class="meta-lbl">Modifié le</span>
+                    <span class="meta-val">{{ $building->updated_at->format('d/m/Y') }}</span>
+                </div>
+            </div>
+        </div>
+
+        {{-- Danger zone --}}
+        <div class="danger-zone">
+            <div class="danger-title">⚠️ Zone de danger</div>
+            <div class="danger-desc">
+                Suppression définitive. Tous les appartements liés seront aussi supprimés.
+            </div>
+            <form method="POST"
+                  action="{{ route('manager.buildings.destroy', $building->id) }}"
+                  onsubmit="return confirm('Supprimer définitivement « {{ addslashes($building->name) }} » et tous ses appartements ?')">
+                @csrf @method('DELETE')
+                <button type="submit" class="btn-danger">
+                    <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                    </svg>
+                    Supprimer cet immeuble
+                </button>
+            </form>
+        </div>
+
+    </div>
+</div>
+@endsection

@@ -1,0 +1,51 @@
+
+services:
+  proimmo-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: proimmo-app
+    restart: unless-stopped
+    volumes:
+      - .:/var/www
+    networks:
+      - proimmo-network
+
+  proimmo-web:
+    image: nginx:alpine
+    container_name: proimmo-web
+    restart: unless-stopped
+    ports:
+      - "8083:80"
+    volumes:
+      - .:/var/www
+      # ────────────────────────────────────────
+      # Remplace cette ligne problématique :
+      # - ./docker/nginx.conf:/etc/nginx/conf.d/default.conf
+      # par celle-ci (monte le dossier) :
+      - ./docker/nginx/conf.d:/etc/nginx/conf.d
+      # ────────────────────────────────────────
+    depends_on:
+      - proimmo-app
+    networks:
+      - proimmo-network
+
+  proimmo-db:
+    image: mysql:8.0
+    container_name: proimmo-db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: proimmo
+      MYSQL_ROOT_PASSWORD: yes
+      # ou MYSQL_ALLOW_EMPTY_PASSWORD: "yes" si tu veux vraiment pas de mot de passe
+    volumes:
+      - proimmo_dbdata:/var/lib/mysql
+    networks:
+      - proimmo-network
+
+networks:
+  proimmo-network:
+    driver: bridge
+
+volumes:
+  proimmo_dbdata:
