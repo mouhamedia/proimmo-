@@ -10,8 +10,9 @@ class BuildingController extends Controller
     public function index()
     {
         $residenceId = \Auth::user()->residence_id;
-        $buildings = Building::where('residence_id', $residenceId)->get();
-        return view('buildings.index', compact('buildings'));
+           // Pagination pour éviter de charger trop d'immeubles en mémoire
+           $buildings = Building::where('residence_id', $residenceId)->paginate(20);
+           return view('buildings.index', compact('buildings'));
     }
 
     public function create()
@@ -26,25 +27,57 @@ class BuildingController extends Controller
             'address' => 'required',
             'floors' => 'required|integer|min:1',
         ]);
+
+        $user = \Auth::user();
+
+        // Créer une résidence si l'utilisateur n'en a pas
+        if (!$user->residence_id) {
+            $residence = \App\Models\Residence::create([
+                'name' => $user->name . ' - Résidence',
+                'manager_id' => $user->id,
+                'address' => 'Adresse inconnue', // Ajout d'une adresse par défaut
+            ]);
+            $user->update(['residence_id' => $residence->id]);
+            $user->refresh();
+        }
+
+        // Vérification finale que residence_id est bien présent
+        if (!$user->residence_id) {
+            return redirect()->back()->withErrors(['residence_id' => "Impossible d'associer une résidence à l'utilisateur."]);
+        }
+
         $data = $request->only('name', 'address', 'floors');
-        $data['residence_id'] = \Auth::user()->residence_id;
-        // On suppose que la résidence existe déjà (créée à la création de l'utilisateur)
+        $data['residence_id'] = $user->residence_id;
+
         Building::create($data);
+
         return redirect()->route('buildings.index')->with('success', 'Immeuble créé avec succès');
     }
 
     public function show(Building $building)
     {
-        $building->load('apartments');
-        $apartments = $building->apartments;
-        $building->apartments_count = $apartments->count();
-        $building->occupied_count = $apartments->where('status', 'occupé')->count();
-        $building->vacant_count = $apartments->where('status', 'vacant')->count();
-        $building->work_count = $apartments->where('status', 'en travaux')->count();
-        $building->total_rent = $apartments->sum('rent_amount');
-        $building->average_rent = $apartments->count() ? round($apartments->avg('rent_amount')) : 0;
-        $building->occupation_rate = $building->apartments_count ? round($building->occupied_count / $building->apartments_count * 100) : 0;
-        return view('manager.buildings.show', compact('building'));
+           // Optimisation : calculs SQL pour éviter de charger tous les appartements en mémoire
+           $apartments_count = $building->apartments()->count();
+           $occupied_count = $building->apartments()->where('status', 'occupé')->count();
+           $vacant_count = $building->apartments()->where('status', 'vacant')->count();
+           $work_count = $building->apartments()->where('status', 'en travaux')->count();
+           $total_rent = $building->apartments()->sum('rent_amount');
+           $average_rent = $apartments_count ? round($building->apartments()->avg('rent_amount')) : 0;
+           $occupation_rate = $apartments_count ? round($occupied_count / $apartments_count * 100) : 0;
+
+           // On charge uniquement les appartements nécessaires (pagination possible si besoin)
+           $apartments = $building->apartments()->get();
+
+           // On passe les statistiques à la vue
+           $building->apartments_count = $apartments_count;
+           $building->occupied_count = $occupied_count;
+           $building->vacant_count = $vacant_count;
+           $building->work_count = $work_count;
+           $building->total_rent = $total_rent;
+           $building->average_rent = $average_rent;
+           $building->occupation_rate = $occupation_rate;
+           $building->setRelation('apartments', $apartments);
+           return view('manager.buildings.show', compact('building'));
     }
 
     public function edit(Building $building)

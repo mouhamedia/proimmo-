@@ -6,7 +6,7 @@ RUN apt-get update && \
     docker-php-ext-configure gd --with-freetype --with-jpeg && \
     docker-php-ext-install gd pdo pdo_mysql
 
-# 2. Installer Node.js 22 (AVANT de copier le code pour isoler les couches)
+# 2. Installer Node.js 22
 RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - && \
     apt-get install -y nodejs
 
@@ -14,12 +14,16 @@ RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - && \
 COPY --from=composer:2.7 /usr/bin/composer /usr/bin/composer
 ENV COMPOSER_ALLOW_SUPERUSER=1
 
+# 4. Config PHP pour Laravel (cookies + session)
+RUN echo "output_buffering = 4096" > /usr/local/etc/php/conf.d/laravel.ini \
+ && echo "session.cookie_samesite = Lax" >> /usr/local/etc/php/conf.d/laravel.ini
+
 WORKDIR /var/www
 
-# 4. Copier les fichiers (Assure-toi d'avoir le .dockerignore créé plus bas)
+# 5. Copier les fichiers
 COPY . .
 
-# 5. Nettoyer et Installer
+# 6. Nettoyer et Installer
 RUN rm -rf node_modules vendor && \
     composer install --no-interaction --prefer-dist --optimize-autoloader && \
     npm install && \

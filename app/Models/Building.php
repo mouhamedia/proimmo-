@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Building extends Model
 {
     protected $fillable = [
-        'residence_id', 'name', 'floors'
+        'residence_id', 'name', 'address', 'floors'
     ];
 
     // Relation avec la résidence

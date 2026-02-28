@@ -1,5 +1,6 @@
 
 
+
 <?php
 
 use Illuminate\Support\Facades\Route;
@@ -50,4 +51,40 @@ Route::middleware(['auth'])->group(function() {
     Route::get('/dashboard', [\App\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
     Route::post('/dashboard/verify-code', [\App\Http\Controllers\DashboardController::class, 'verifyCode'])->name('dashboard.verifyCode');
 });
+// Debug : affiche le token CSRF et la session
+Route::get('/debug-csrf', function () {
+    return [
+        'csrf_token' => csrf_token(),
+        'session_id' => session()->getId(),
+        'all_data' => session()->all(),
+        'has_cookie' => request()->hasCookie('laravel_session'),
+        'cookies' => request()->cookies->all(),
+    ];
+})->middleware('web');
 
+// Debug : force la création de la session et affiche le cookie
+Route::get('/debug-session-set', function () {
+    session(['test_key' => 'valeur_de_test']);
+    return [
+        'session_id' => session()->getId(),
+        'all_data' => session()->all(),
+        'has_cookie' => request()->hasCookie('laravel_session'),
+        'cookies' => request()->cookies->all(),
+    ];
+})->middleware('web');
+
+// Debug : force la création du cookie de session
+Route::get('/test-cookie', function () {
+    session(['cookie_test' => 'ok']);
+    return response('Cookie de session forcé')->withCookie(cookie('laravel_session', session()->getId(), 120));
+});
+
+Route::get("/test-cookie", function() {
+    session(["test" => "ok"]);
+    return response("cookie test")->cookie("test_cookie", "hello", 60);
+});
+
+Route::get("/test-cookie", function() {
+    session(["test" => "ok"]);
+    return response("cookie test")->cookie("test_cookie", "hello", 60);
+});
