@@ -3,7 +3,7 @@
 @section('page-title', 'Modifier un immeuble')
 
 @section('breadcrumb')
-    <a href="{{ route('buildings.index') }}" style="color:#8B8FA8;text-decoration:none;transition:color 0.2s;"
+    <a href="{{ route('manager.buildings.index') }}" style="color:#8B8FA8;text-decoration:none;transition:color 0.2s;"
        onmouseover="this.style.color='#1A1A2E'" onmouseout="this.style.color='#8B8FA8'">Immeubles</a>
     &nbsp;/&nbsp;<span style="color:#1A1A2E;font-weight:600;">{{ $building->name }}</span>
 @endsection
@@ -290,7 +290,7 @@
     </div>
 </div>
 
-<form method="POST" action="{{ route('buildings.update', $building) }}">
+<form method="POST" action="{{ route('manager.buildings.update', $building) }}">
 @csrf
 @method('PUT')
 
@@ -365,7 +365,7 @@
                 </svg>
                 Enregistrer les modifications
             </button>
-            <a href="{{ route('buildings.index') }}" class="btn-cancel">Annuler</a>
+            <a href="{{ route('manager.buildings.index') }}" class="btn-cancel">Annuler</a>
         </div>
     </div>
 
@@ -415,7 +415,7 @@
             <div class="danger-desc">
                 La suppression est définitive. Tous les appartements liés seront également supprimés.
             </div>
-            <form method="POST" action="{{ route('buildings.destroy', $building) }}"
+            <form method="POST" action="{{ route('manager.buildings.destroy', $building) }}"
                   onsubmit="return confirm('Supprimer définitivement l\'immeuble « {{ addslashes($building->name) }} » et tous ses appartements ?')">
                 @csrf @method('DELETE')
                 <button type="submit" class="btn-danger">

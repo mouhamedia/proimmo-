@@ -563,7 +563,7 @@
                 </a>
                 @endif
                 @if(Route::has('buildings.index'))
-                <a href="{{ route('buildings.index') }}" class="quick-btn">
+                <a href="{{ route('manager.buildings.index') }}" class="quick-btn">
                     <div class="qb-icon">
                         <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

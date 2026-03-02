@@ -5,7 +5,7 @@
     <nav>
         <ul>
             <li><a href="{{ route('manager.dashboard') }}">Dashboard</a></li>
-            <li><a href="{{ route('buildings.index') }}">Immeubles</a></li>
+            <li><a href="{{ route('manager.buildings.index') }}">Immeubles</a></li>
             <li><a href="{{ route('manager.apartments.index') }}">Appartements</a></li>
             <li><a href="{{ route('manager.tenants.index') }}">Locataires</a></li>
             <li>

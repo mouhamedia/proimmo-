@@ -8,9 +8,13 @@ class BuildingController extends Controller
     // Liste des immeubles
     public function index()
     {
-        $residenceId = \Auth::user()->residence_id;
-        $buildings = \App\Models\Building::where('residence_id', $residenceId)->get();
-        return view('manager.buildings.index', compact('buildings'));
+        $manager = auth()->user();
+        $residence = $manager->residence;
+        $buildings = \App\Models\Building::where('residence_id', $residence->id)
+            ->withCount('apartments')
+            ->get();
+        $apartments = \App\Models\Apartment::whereIn('building_id', $buildings->pluck('id'))->get();
+        return view('manager.buildings.index', compact('buildings', 'apartments'));
     }
 
     // Formulaire création
@@ -24,8 +28,10 @@ class BuildingController extends Controller
     {
         $validated = $request->validated();
         $validated['residence_id'] = \Auth::user()->residence_id;
+        // Ajout d'une valeur par défaut si address n'est pas présent
+        $validated['address'] = $request->input('address', '');
         \App\Models\Building::create($validated);
-        return redirect()->route('buildings.index')->with('success', 'Immeuble créé avec succès');
+        return redirect()->route('manager.buildings.index')->with('success', 'Immeuble créé avec succès');
     }
 
     // Formulaire édition
@@ -40,7 +46,7 @@ class BuildingController extends Controller
     {
         $building = \App\Models\Building::where('residence_id', \Auth::user()->residence_id)->findOrFail($id);
         $building->update($request->validated());
-        return redirect()->route('buildings.index')->with('success', 'Immeuble modifié avec succès');
+        return redirect()->route('manager.buildings.index')->with('success', 'Immeuble modifié avec succès');
     }
 
     // Supprime un immeuble
@@ -48,6 +54,13 @@ class BuildingController extends Controller
     {
         $building = \App\Models\Building::where('residence_id', \Auth::user()->residence_id)->findOrFail($id);
         $building->delete();
-        return redirect()->route('buildings.index')->with('success', 'Immeuble supprimé');
+        return redirect()->route('manager.buildings.index')->with('success', 'Immeuble supprimé');
+    }
+
+    // Affiche la page d'un immeuble
+    public function show($id)
+    {
+        $building = \App\Models\Building::where('residence_id', \Auth::user()->residence_id)->withCount('apartments')->findOrFail($id);
+        return view('manager.buildings.show', compact('building'));
     }
 }

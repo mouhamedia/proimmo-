@@ -1,13 +1,13 @@
-
-
-
 <?php
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\AccessCodeController;
-use App\Http\Controllers\ApartmentController;
-use App\Http\Controllers\BuildingController;
+use App\Http\Controllers\Manager\ApartmentController;
+use App\Http\Controllers\Manager\BuildingController;
+use App\Http\Controllers\Manager\TenantController;
+use App\Http\Controllers\Manager\MaintenanceWorkerController;
+use App\Http\Controllers\DashboardController;
 
 // Page d'accueil
 Route::get('/', function () {
@@ -30,27 +30,15 @@ Route::post('/logout', function () {
 Route::get('/acces-code', [AccessCodeController::class, 'showForm'])->name('code.form');
 Route::post('/acces-code', [AccessCodeController::class, 'submitCode'])->name('code.access');
 
-// Gestion des immeubles (CRUD)
-Route::resource('buildings', BuildingController::class);
-Route::get('/buildings/{building}', [App\Http\Controllers\BuildingController::class, 'show'])->name('buildings.show');
-
-// Gestion des appartements (CRUD)
-Route::resource('apartments', ApartmentController::class);
-
-// Gestion des appartements et dashboard pour le manager
+// Gestion des immeubles, appartements, locataires et maintenanciers pour le manager
 Route::middleware(['auth'])->prefix('manager')->name('manager.')->group(function () {
-    Route::resource('apartments', App\Http\Controllers\Manager\ApartmentController::class);
     Route::resource('buildings', App\Http\Controllers\Manager\BuildingController::class);
+    Route::resource('apartments', App\Http\Controllers\Manager\ApartmentController::class);
     Route::resource('tenants', App\Http\Controllers\Manager\TenantController::class);
     Route::resource('maintenance_workers', App\Http\Controllers\Manager\MaintenanceWorkerController::class);
     Route::get('dashboard', [App\Http\Controllers\Manager\DashboardController::class, 'index'])->name('dashboard');
 });
 
-// Dashboard (auth obligatoire)
-Route::middleware(['auth'])->group(function() {
-    Route::get('/dashboard', [\App\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
-    Route::post('/dashboard/verify-code', [\App\Http\Controllers\DashboardController::class, 'verifyCode'])->name('dashboard.verifyCode');
-});
 // Debug : affiche le token CSRF et la session
 Route::get('/debug-csrf', function () {
     return [
@@ -79,12 +67,9 @@ Route::get('/test-cookie', function () {
     return response('Cookie de session forcé')->withCookie(cookie('laravel_session', session()->getId(), 120));
 });
 
-Route::get("/test-cookie", function() {
-    session(["test" => "ok"]);
-    return response("cookie test")->cookie("test_cookie", "hello", 60);
-});
+// Connexion par code d'accès (locataire/maintenancier)
+Route::get('code-login', function() {
+    return view('auth.code_login');
+})->name('code.login.view');
+Route::post('code-login', [App\Http\Controllers\Auth\CodeLoginController::class, 'login'])->name('code.login.submit');
 
-Route::get("/test-cookie", function() {
-    session(["test" => "ok"]);
-    return response("cookie test")->cookie("test_cookie", "hello", 60);
-});

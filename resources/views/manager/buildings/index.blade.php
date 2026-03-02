@@ -1,290 +1,412 @@
 @extends('layouts.app')
 
-@section('page-title', 'Appartements')
+@section('page-title', 'Immeubles')
 
 @section('breadcrumb')
-    <span>Accueil</span> / <span>Appartements</span>
+    <span style="color:#1A1A2E;font-weight:600;">Immeubles</span>
 @endsection
 
 @section('content')
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Syne:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
+    /* ── Reset contextuel ── */
+    * { box-sizing: border-box; }
+
+    /* ── Variables ── */
+    :root {
+        --ink:     #0F0E0C;
+        --paper:   #F9F7F4;
+        --cream:   #EFE9DF;
+        --gold:    #B8924A;
+        --gold-lt: #D4AA6A;
+        --navy:    #1B2A4A;
+        --navy-lt: #2C3E6B;
+        --muted:   #8A8478;
+        --border:  #E2DDD6;
+    }
+
+    /* ── Page header ── */
     .page-header {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        margin-bottom: 28px;
+        margin-bottom: 32px;
         flex-wrap: wrap;
         gap: 16px;
     }
     .page-title-text {
-        font-family: 'Playfair Display', serif;
-        font-size: 22px;
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 32px;
         font-weight: 600;
-        color: #1A1A2E;
-        margin-bottom: 4px;
+        color: var(--ink);
+        line-height: 1;
+        margin-bottom: 6px;
     }
-    .page-sub { font-size: 13px; color: #8B8FA8; }
+    .page-sub {
+        font-family: 'Syne', sans-serif;
+        font-size: 12.5px;
+        color: var(--muted);
+        letter-spacing: 0.01em;
+    }
 
+    /* ── Bouton ajouter ── */
     .btn-add {
         display: inline-flex;
         align-items: center;
         gap: 8px;
-        background: #1A1A2E;
-        color: #C9A96E;
-        border: 1px solid #C9A96E;
-        border-radius: 8px;
-        padding: 10px 20px;
-        font-size: 13px;
+        background: var(--navy);
+        color: var(--gold-lt);
+        border: 1px solid var(--gold);
+        border-radius: 10px;
+        padding: 11px 22px;
+        font-family: 'Syne', sans-serif;
+        font-size: 12.5px;
         font-weight: 600;
         text-decoration: none;
         transition: all 0.2s;
-        font-family: 'DM Sans', sans-serif;
+        white-space: nowrap;
+        letter-spacing: 0.02em;
     }
-    .btn-add:hover { background: #C9A96E; color: #1A1A2E; }
+    .btn-add:hover {
+        background: var(--gold);
+        color: var(--navy);
+        border-color: var(--gold);
+        box-shadow: 0 4px 20px rgba(184,146,74,0.3);
+        transform: translateY(-1px);
+    }
 
-    /* Stats */
+    /* ── Stats ── */
     .stats-row {
         display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 16px;
-        margin-bottom: 28px;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 18px;
+        margin-bottom: 32px;
     }
     @media (max-width: 768px) { .stats-row { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 480px)  { .stats-row { grid-template-columns: 1fr; } }
 
     .stat-card {
         background: #fff;
-        border: 1px solid #EEECEA;
-        border-radius: 12px;
-        padding: 18px 20px;
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 22px 24px;
         display: flex;
         align-items: center;
-        gap: 14px;
-        transition: box-shadow 0.2s;
+        gap: 16px;
+        transition: box-shadow 0.2s, transform 0.2s;
+        position: relative;
+        overflow: hidden;
     }
-    .stat-card:hover { box-shadow: 0 4px 16px rgba(13,17,23,0.06); }
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 2px;
+        background: linear-gradient(90deg, var(--gold), var(--gold-lt));
+        transform: scaleX(0);
+        transform-origin: left;
+        transition: transform 0.3s ease;
+    }
+    .stat-card:hover::before { transform: scaleX(1); }
+    .stat-card:hover {
+        box-shadow: 0 8px 28px rgba(15,14,12,0.07);
+        transform: translateY(-2px);
+    }
 
     .stat-icon {
-        width: 40px; height: 40px;
-        border-radius: 10px;
+        width: 44px; height: 44px;
+        border-radius: 12px;
         display: flex; align-items: center; justify-content: center;
         flex-shrink: 0;
     }
     .stat-val {
-        font-family: 'Playfair Display', serif;
-        font-size: 24px;
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 34px;
         font-weight: 600;
-        color: #1A1A2E;
+        color: var(--ink);
         line-height: 1;
-        margin-bottom: 2px;
+        margin-bottom: 3px;
     }
-    .stat-lbl { font-size: 11px; color: #8B8FA8; }
+    .stat-lbl {
+        font-family: 'Syne', sans-serif;
+        font-size: 11px;
+        color: var(--muted);
+        letter-spacing: 0.02em;
+    }
 
-    /* Table card */
+    /* ── Table card ── */
     .table-card {
         background: #fff;
-        border: 1px solid #EEECEA;
-        border-radius: 14px;
+        border: 1px solid var(--border);
+        border-radius: 16px;
         overflow: hidden;
     }
     .table-card-top {
-        padding: 16px 24px;
-        border-bottom: 1px solid #EEECEA;
+        padding: 18px 26px;
+        border-bottom: 1px solid var(--border);
         display: flex;
         align-items: center;
         justify-content: space-between;
         gap: 12px;
         flex-wrap: wrap;
+        background: #fff;
     }
-    .table-card-title { font-size: 14px; font-weight: 700; color: #1A1A2E; }
-    .apt-count {
-        font-size: 12px; color: #8B8FA8;
-        background: #F8F7F5;
+    .table-card-title {
+        font-family: 'Syne', sans-serif;
+        font-size: 13.5px;
+        font-weight: 700;
+        color: var(--ink);
+    }
+    .b-count {
+        font-family: 'Syne', sans-serif;
+        font-size: 11px;
+        color: var(--muted);
+        background: var(--paper);
+        border: 1px solid var(--border);
         padding: 3px 10px;
         border-radius: 20px;
+        font-weight: 600;
     }
 
+    /* ── Search ── */
     .search-wrap { position: relative; }
     .search-icon {
-        position: absolute; left: 10px; top: 50%;
+        position: absolute; left: 11px; top: 50%;
         transform: translateY(-50%);
-        color: #8B8FA8; pointer-events: none;
+        color: var(--muted); pointer-events: none;
     }
     .search-input {
-        height: 36px;
-        background: #F8F7F5;
-        border: 1px solid #E5E3DF;
-        border-radius: 8px;
-        padding: 0 12px 0 34px;
-        font-size: 13px;
-        font-family: 'DM Sans', sans-serif;
-        color: #1A1A2E;
+        height: 38px;
+        background: var(--paper);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 0 14px 0 36px;
+        font-family: 'Syne', sans-serif;
+        font-size: 12.5px;
+        color: var(--ink);
         outline: none;
-        width: 200px;
-        transition: border-color 0.2s;
+        width: 220px;
+        transition: all 0.2s;
     }
-    .search-input:focus { border-color: #C9A96E; background: #fff; }
-    .search-input::placeholder { color: #B0ACA8; }
+    .search-input:focus {
+        border-color: var(--gold);
+        background: #fff;
+        box-shadow: 0 0 0 3px rgba(184,146,74,0.1);
+    }
+    .search-input::placeholder { color: #C0B9B0; }
 
-    table { width: 100%; border-collapse: collapse; }
+    /* ── Table ── */
+    .table-scroll { overflow-x: auto; width: 100%; }
+
+    table { width: 100%; border-collapse: collapse; min-width: 500px; }
+
     thead th {
-        padding: 11px 20px;
+        padding: 12px 24px;
         text-align: left;
+        font-family: 'Syne', sans-serif;
         font-size: 10px;
         font-weight: 700;
-        letter-spacing: 1.5px;
+        letter-spacing: 2px;
         text-transform: uppercase;
-        color: #8B8FA8;
-        background: #F8F7F5;
-        border-bottom: 1px solid #EEECEA;
+        color: var(--muted);
+        background: var(--paper);
+        border-bottom: 1px solid var(--border);
         white-space: nowrap;
     }
     tbody tr {
-        border-bottom: 1px solid #F5F3F1;
+        border-bottom: 1px solid #F2EEE9;
         transition: background 0.15s;
     }
     tbody tr:last-child { border-bottom: none; }
-    tbody tr:hover { background: #FAFAF9; }
+    tbody tr:hover { background: #FDFCFA; }
     tbody td {
-        padding: 13px 20px;
+        padding: 15px 24px;
+        font-family: 'Syne', sans-serif;
         font-size: 13px;
-        color: #1A1A2E;
+        color: var(--ink);
         vertical-align: middle;
     }
 
-    /* Cells */
-    .apt-num {
-        font-family: 'Courier New', monospace;
-        font-size: 14px;
-        font-weight: 700;
-        background: #F8F7F5;
-        border: 1px solid #E5E3DF;
-        border-radius: 6px;
-        padding: 3px 10px;
-        letter-spacing: 1px;
-        display: inline-block;
-    }
-    .type-tag {
-        background: #EFF6FF;
-        color: #2563EB;
-        font-size: 11px;
-        font-weight: 600;
-        padding: 3px 10px;
-        border-radius: 20px;
-        display: inline-block;
-    }
-    .rent-val { font-weight: 600; }
-    .rent-cur { font-size: 11px; color: #8B8FA8; margin-left: 2px; }
-
-    .status-badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 5px;
-        font-size: 11px;
-        font-weight: 600;
-        padding: 4px 10px;
-        border-radius: 20px;
-        white-space: nowrap;
-    }
-    .status-badge .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
-    .status-badge.occupied  { background: #ECFDF5; color: #059669; }
-    .status-badge.vacant    { background: #FEF3C7; color: #D97706; }
-    .status-badge.work      { background: #FEF2F2; color: #DC2626; }
-    .status-badge.default   { background: #F3F4F6; color: #6B7280; }
-
-    .building-cell { display: flex; align-items: center; gap: 6px; }
-    .building-dot  { width: 8px; height: 8px; background: #C9A96E; border-radius: 2px; flex-shrink: 0; }
-
-    .actions { display: flex; gap: 6px; }
-    .act-btn {
-        width: 30px; height: 30px;
-        border: none; border-radius: 7px;
-        cursor: pointer;
-        display: inline-flex; align-items: center; justify-content: center;
-        transition: all 0.15s;
-        text-decoration: none;
-    }
-    .act-btn.edit   { background: #FEF3C7; color: #D97706; }
-    .act-btn.edit:hover { background: #FDE68A; }
-    .act-btn.del    { background: #FEF2F2; color: #DC2626; }
-    .act-btn.del:hover { background: #FEE2E2; }
-
-    /* Empty */
-    .empty-state { text-align: center; padding: 64px 20px; }
-    .empty-icon {
-        width: 56px; height: 56px;
-        background: #F8F7F5; border-radius: 14px;
+    /* ── Building cell ── */
+    .building-cell { display: flex; align-items: center; gap: 13px; }
+    .building-avatar {
+        width: 38px; height: 38px;
+        border-radius: 10px;
+        background: linear-gradient(135deg, var(--navy) 0%, var(--navy-lt) 100%);
         display: flex; align-items: center; justify-content: center;
-        margin: 0 auto 16px;
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 17px; font-weight: 700;
+        color: var(--gold-lt);
+        flex-shrink: 0;
     }
-    .empty-title { font-size: 15px; font-weight: 700; color: #1A1A2E; margin-bottom: 6px; }
-    .empty-sub   { font-size: 13px; color: #8B8FA8; margin-bottom: 20px; }
+    .building-name {
+        font-family: 'Syne', sans-serif;
+        font-weight: 600;
+        color: var(--ink);
+        font-size: 13px;
+    }
+    .building-addr {
+        font-family: 'Syne', sans-serif;
+        font-size: 11px;
+        color: var(--muted);
+        margin-top: 2px;
+    }
 
-    /* Flash */
-    .flash {
-        display: flex; align-items: center; gap: 8px;
-        padding: 12px 16px; border-radius: 10px;
-        font-size: 13px; margin-bottom: 20px;
+    /* ── Floor badge ── */
+    .floor-badge {
+        display: inline-flex; align-items: center; gap: 5px;
+        background: #EEF2FF;
+        color: #3B5EC6;
+        font-family: 'Syne', sans-serif;
+        font-size: 11.5px; font-weight: 600;
+        padding: 4px 11px;
+        border-radius: 20px;
     }
-    .flash.ok  { background: #ECFDF5; border: 1px solid #A7F3D0; color: #065F46; }
+
+    /* ── Apt pill ── */
+    .apt-pill {
+        display: inline-flex; align-items: center; gap: 5px;
+        background: var(--paper);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 5px 12px;
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 16px; font-weight: 600;
+        color: var(--ink);
+    }
+
+    /* ── Actions (garde les classes Bootstrap btn btn-sm) ── */
+    .actions { display: flex; gap: 6px; align-items: center; }
+
+    .actions .btn-info {
+        display: inline-flex; align-items: center; justify-content: center;
+        height: 30px; padding: 0 12px;
+        border-radius: 8px;
+        font-family: 'Syne', sans-serif;
+        font-size: 11px; font-weight: 600;
+        background: #EEF2FF; color: #3B5EC6;
+        border: 1px solid #C7D4FF;
+        text-decoration: none;
+        transition: all 0.15s;
+    }
+    .actions .btn-info:hover { background: #DDE6FF; transform: scale(1.05); }
+
+    .actions .btn-warning {
+        display: inline-flex; align-items: center; justify-content: center;
+        height: 30px; padding: 0 12px;
+        border-radius: 8px;
+        font-family: 'Syne', sans-serif;
+        font-size: 11px; font-weight: 600;
+        background: #FFF7E6; color: #B07A20;
+        border: 1px solid #F5D98A;
+        text-decoration: none;
+        transition: all 0.15s;
+    }
+    .actions .btn-warning:hover { background: #FEECC0; transform: scale(1.05); }
+
+    .actions .btn-danger {
+        display: inline-flex; align-items: center; justify-content: center;
+        height: 30px; padding: 0 12px;
+        border-radius: 8px;
+        font-family: 'Syne', sans-serif;
+        font-size: 11px; font-weight: 600;
+        background: #FFF1F0; color: #C0392B;
+        border: 1px solid #FFCBC9;
+        cursor: pointer;
+        transition: all 0.15s;
+    }
+    .actions .btn-danger:hover { background: #FFE0DE; transform: scale(1.05); }
+
+    /* ── Empty state ── */
+    .empty-state { text-align: center; padding: 72px 20px; }
+    .empty-icon {
+        width: 60px; height: 60px;
+        background: var(--cream);
+        border-radius: 16px;
+        display: flex; align-items: center; justify-content: center;
+        margin: 0 auto 18px;
+    }
+    .empty-title {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 20px; font-weight: 600;
+        color: var(--ink); margin-bottom: 8px;
+    }
+    .empty-sub {
+        font-family: 'Syne', sans-serif;
+        font-size: 13px; color: var(--muted); margin-bottom: 24px;
+    }
+
+    /* ── Flash ── */
+    .flash {
+        display: flex; align-items: center; gap: 9px;
+        padding: 13px 16px;
+        border-radius: 11px;
+        font-family: 'Syne', sans-serif;
+        font-size: 13px;
+        margin-bottom: 24px;
+    }
+    .flash.ok  { background: #F0FAF4; border: 1px solid #A8DFC0; color: #1A6B3C; }
     .flash.err { background: #FEF2F2; border: 1px solid #FECACA; color: #991B1B; }
 </style>
 
 @if(session('success'))
 <div class="flash ok">
-    <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+    <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+    </svg>
     {{ session('success') }}
 </div>
 @endif
 
 <div class="page-header">
     <div>
-        <div class="page-title-text">Appartements</div>
-        <div class="page-sub">Gérez tous les appartements de votre portefeuille</div>
+        <div class="page-title-text">Immeubles</div>
+        <div class="page-sub">Gérez les immeubles de votre résidence</div>
     </div>
-    <a href="{{ route('manager.apartments.create') }}" class="btn-add">
+    <a href="{{ route('manager.buildings.create') }}" class="btn-add">
         <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/>
         </svg>
-        Ajouter un appartement
+        Ajouter un immeuble
     </a>
 </div>
 
 {{-- Stats --}}
 <div class="stats-row">
     <div class="stat-card">
-        <div class="stat-icon" style="background:#EFF6FF;">
-            <svg width="20" height="20" fill="none" stroke="#2563EB" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+        <div class="stat-icon" style="background:#EEF2FF;">
+            <svg width="20" height="20" fill="none" stroke="#3B5EC6" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+                    d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+            </svg>
         </div>
         <div>
-            <div class="stat-val">{{ $apartments->count() }}</div>
-            <div class="stat-lbl">Total</div>
+            <div class="stat-val">{{ $buildings->count() }}</div>
+            <div class="stat-lbl">Total immeubles</div>
         </div>
     </div>
     <div class="stat-card">
-        <div class="stat-icon" style="background:#ECFDF5;">
-            <svg width="20" height="20" fill="none" stroke="#059669" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+        <div class="stat-icon" style="background:#F0FAF4;">
+            <svg width="20" height="20" fill="none" stroke="#1A8A4C" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+                    d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+            </svg>
         </div>
         <div>
-            <div class="stat-val">{{ $apartments->where('status', 'occupé')->count() }}</div>
-            <div class="stat-lbl">Occupés</div>
-        </div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-icon" style="background:#FEF3C7;">
-            <svg width="20" height="20" fill="none" stroke="#D97706" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"/></svg>
-        </div>
-        <div>
-            <div class="stat-val">{{ $apartments->where('status', 'vacant')->count() }}</div>
-            <div class="stat-lbl">Vacants</div>
+            <div class="stat-val">{{ $buildings->sum(fn($b) => $b->apartments_count ?? 0) }}</div>
+            <div class="stat-lbl">Total appartements</div>
         </div>
     </div>
     <div class="stat-card">
         <div class="stat-icon" style="background:#FDF8EE;">
-            <svg width="20" height="20" fill="none" stroke="#C9A96E" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <svg width="20" height="20" fill="none" stroke="#B8924A" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+                    d="M7 21h10M12 3v18M5 7l7-4 7 4"/>
+            </svg>
         </div>
         <div>
-            <div class="stat-val">{{ number_format($apartments->sum('rent_amount') / 1000, 0) }}k</div>
-            <div class="stat-lbl">FCFA / mois</div>
+            <div class="stat-val">{{ $buildings->max('floors') ?? 0 }}</div>
+            <div class="stat-lbl">Max étages</div>
         </div>
     </div>
 </div>
@@ -293,8 +415,8 @@
 <div class="table-card">
     <div class="table-card-top">
         <div style="display:flex;align-items:center;gap:10px;">
-            <div class="table-card-title">Liste des appartements</div>
-            <span class="apt-count">{{ $apartments->count() }}</span>
+            <div class="table-card-title">Liste des immeubles</div>
+            <span class="b-count">{{ $buildings->count() }}</span>
         </div>
         <div class="search-wrap">
             <svg class="search-icon" width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -302,103 +424,87 @@
             </svg>
             <input type="text" class="search-input" id="searchInput" placeholder="Rechercher…">
         </div>
-    <div style="overflow-x:auto; width:100%;">
-    <table id="aptTable" style="min-width:500px; width:100%; background:#fff; border-radius:12px; overflow:hidden; border:1px solid #EEECEA;">
-
-    @if($apartments->isEmpty())
-    <div class="empty-state">
-        <div class="empty-icon">
-            <svg width="24" height="24" fill="none" stroke="#8B8FA8" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
-            </svg>
-        </div>
-        <div class="empty-title">Aucun appartement</div>
-        <div class="empty-sub">Commencez par ajouter votre premier appartement.</div>
-        <a href="{{ route('manager.apartments.create') }}" class="btn-add">
-            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
-            Ajouter
-        </a>
     </div>
-    @else
-    <table id="aptTable">
-        <thead>
-            <tr>
-                <th>Numéro</th>
-                <th>Type</th>
-                <th>Loyer mensuel</th>
-                <th>Statut</th>
-                <th>Immeuble</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        @foreach($apartments as $apartment)
-            @php
-                $st = strtolower($apartment->status);
-                $stClass = match(true) {
-                    str_contains($st, 'occup') => 'occupied',
-                    str_contains($st, 'vacant') => 'vacant',
-                    str_contains($st, 'travaux') => 'work',
-                    default => 'default'
-                };
-            @endphp
-            <tr>
-                <td><span class="apt-num">{{ $apartment->number }}</span></td>
-                <td><span class="type-tag">{{ $apartment->type }}</span></td>
-                <td>
-                    <span class="rent-val">{{ number_format($apartment->rent_amount, 0, ',', ' ') }}</span>
-                    <span class="rent-cur">FCFA</span>
-                </td>
-                <td>
-                    <span class="status-badge {{ $stClass }}">
-                        <span class="dot"></span>
-                        {{ ucfirst($apartment->status) }}
-                    </span>
-                </td>
-                <td>
-                    <div class="building-cell">
-                        <div class="building-dot"></div>
-                        <span style="color:#4B5563;">{{ $apartment->building->name ?? '—' }}</span>
-                    </div>
-                </td>
-                <td>
-                    <div class="actions">
-                        <a href="{{ route('manager.apartments.edit', $apartment->id) }}" class="act-btn edit" title="Modifier">
-                            <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                            </svg>
-                        </a>
-                        <form method="POST" action="{{ route('manager.apartments.destroy', $apartment->id) }}"
-                              onsubmit="return confirm('Supprimer l\'appartement {{ addslashes($apartment->number) }} ?')">
-                            @csrf @method('DELETE')
-                            <button type="submit" class="act-btn del" title="Supprimer">
-                                <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                                </svg>
-                            </button>
-                        </form>
-                    </div>
-                </td>
-            </tr>
-        @endforeach
-        </tbody>
-    </table>
+
+    @if($buildings->isEmpty())
+        <div class="empty-state">
+            <div class="empty-icon">
+                <svg width="24" height="24" fill="none" stroke="#8A8478" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+                        d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                </svg>
+            </div>
+            <div class="empty-title">Aucun immeuble</div>
+            <div class="empty-sub">Commencez par ajouter votre premier immeuble.</div>
+            <a href="{{ route('manager.buildings.create') }}" class="btn-add">
+                <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/>
+                </svg>
+                Ajouter
+            </a>
         </div>
-        <style>
-            @media (max-width: 700px) {
-                .container { padding: 0 4px; }
-                table { font-size: 13px; }
-                th, td { padding: 8px 6px !important; }
-                h2, .page-title-text { font-size: 1.1rem !important; }
-            }
-        </style>
+    @else
+        <div class="table-scroll">
+            <table id="buildingsTable">
+                <thead>
+                    <tr>
+                        <th>Immeuble</th>
+                        <th>Étages</th>
+                        <th>Appartements</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($buildings as $building)
+                    <tr>
+                        <td>
+                            <div class="building-cell">
+                                <div class="building-avatar">
+                                    {{ strtoupper(substr($building->name, 0, 1)) }}
+                                </div>
+                                <div>
+                                    <div class="building-name">{{ $building->name }}</div>
+                                    <div class="building-addr">{{ $building->address }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="floor-badge">
+                                <svg width="11" height="11" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10M12 3v18M5 7l7-4 7 4"/>
+                                </svg>
+                                {{ $building->floors }} étage{{ $building->floors > 1 ? 's' : '' }}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="apt-pill">
+                                {{ $building->apartments_count ?? $building->apartments()->count() }} appt
+                            </span>
+                        </td>
+                        <td>
+                            <div class="actions">
+                                <a href="{{ route('manager.buildings.show', $building->id) }}" class="btn btn-sm btn-info">Voir</a>
+                                <a href="{{ route('manager.buildings.edit', $building->id) }}" class="btn btn-sm btn-warning">Modifier</a>
+                                <form action="{{ route('manager.buildings.destroy', $building->id) }}" method="POST" style="display:inline">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button class="btn btn-sm btn-danger" onclick="return confirm('Supprimer cet immeuble ?')">Supprimer</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>{{-- fin .table-scroll --}}
     @endif
-</div>
+
+</div>{{-- fin .table-card --}}
 
 <script>
 document.getElementById('searchInput')?.addEventListener('input', function() {
     const q = this.value.toLowerCase();
-    document.querySelectorAll('#aptTable tbody tr').forEach(r => {
+    document.querySelectorAll('#buildingsTable tbody tr').forEach(r => {
         r.style.display = r.textContent.toLowerCase().includes(q) ? '' : 'none';
     });
 });

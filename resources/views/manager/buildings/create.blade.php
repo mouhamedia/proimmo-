@@ -1,263 +1,212 @@
 @extends('layouts.app')
 
-@section('page-title', 'Créer un appartement')
+@section('page-title', 'Nouvel immeuble')
 
 @section('breadcrumb')
-    <a href="{{ route('manager.apartments.index') }}" style="color:#8B8FA8;text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='#1A1A2E'" onmouseout="this.style.color='#8B8FA8'">Appartements</a>
-    &nbsp;/&nbsp;<span>Nouveau</span>
+    <a href="{{ route('manager.buildings.index') }}" style="color:#8A8478;text-decoration:none;font-family:'Syne',sans-serif;font-size:13px;"
+       onmouseover="this.style.color='#0F0E0C'" onmouseout="this.style.color='#8A8478'">Immeubles</a>
+    &nbsp;/&nbsp;
+    <span style="color:#0F0E0C;font-weight:600;font-family:'Syne',sans-serif;font-size:13px;">Nouvel immeuble</span>
 @endsection
 
 @section('content')
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Syne:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
+    :root {
+        --ink:     #0F0E0C;
+        --paper:   #F9F7F4;
+        --cream:   #EFE9DF;
+        --gold:    #B8924A;
+        --gold-lt: #D4AA6A;
+        --navy:    #1B2A4A;
+        --navy-lt: #2C3E6B;
+        --muted:   #8A8478;
+        --border:  #E2DDD6;
+        --error:   #C0392B;
+        --error-bg:#FFF1F0;
+    }
+
     .form-wrap {
         display: grid;
-        grid-template-columns: 1fr 300px;
+        grid-template-columns: 1fr 290px;
         gap: 24px;
         align-items: start;
         max-width: 960px;
     }
     @media (max-width: 860px) { .form-wrap { grid-template-columns: 1fr; } }
 
-    /* Header */
     .pg-header { margin-bottom: 28px; }
     .pg-title {
-        font-family: 'Playfair Display', serif;
-        font-size: 22px; font-weight: 600;
-        color: #1A1A2E; margin-bottom: 4px;
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 32px; font-weight: 600;
+        color: var(--ink); line-height: 1; margin-bottom: 6px;
     }
-    .pg-sub { font-size: 13px; color: #8B8FA8; }
+    .pg-sub { font-family: 'Syne', sans-serif; font-size: 12.5px; color: var(--muted); }
 
-    /* Card */
-    .fcard {
-        background: #fff;
-        border: 1px solid #EEECEA;
-        border-radius: 14px;
-        overflow: hidden;
-    }
+    .fcard { background: #fff; border: 1px solid var(--border); border-radius: 16px; overflow: hidden; }
     .fcard-head {
-        padding: 18px 24px;
-        border-bottom: 1px solid #EEECEA;
-        display: flex; align-items: center; gap: 12px;
+        padding: 18px 26px; border-bottom: 1px solid var(--border);
+        display: flex; align-items: center; gap: 14px; background: #fff;
     }
     .fcard-icon {
-        width: 34px; height: 34px;
-        background: #1A1A2E; border-radius: 8px;
-        display: flex; align-items: center; justify-content: center;
-        flex-shrink: 0;
+        width: 36px; height: 36px; background: var(--navy);
+        border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
     }
-    .fcard-icon svg { color: #C9A96E; }
-    .fcard-title { font-size: 14px; font-weight: 700; color: #1A1A2E; }
-    .fcard-sub   { font-size: 11px; color: #8B8FA8; margin-top: 1px; }
+    .fcard-title { font-family: 'Syne', sans-serif; font-size: 13.5px; font-weight: 700; color: var(--ink); }
+    .fcard-sub   { font-family: 'Syne', sans-serif; font-size: 11px; color: var(--muted); margin-top: 2px; }
+    .fcard-body  { padding: 26px; }
 
-    .fcard-body { padding: 24px; }
-
-    /* Fields */
-    .field { margin-bottom: 18px; }
+    .field { margin-bottom: 20px; }
     .field:last-child { margin-bottom: 0; }
-    .field-row {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 16px;
-        margin-bottom: 18px;
+    .field > label {
+        display: block; font-family: 'Syne', sans-serif;
+        font-size: 10px; font-weight: 700; letter-spacing: 2px;
+        text-transform: uppercase; color: var(--ink); margin-bottom: 8px;
     }
-    .field-row .field { margin-bottom: 0; }
+    .req { color: var(--gold); margin-left: 2px; font-size: 14px; }
 
-    label {
-        display: block;
-        font-size: 10px;
-        font-weight: 700;
-        letter-spacing: 1.5px;
-        text-transform: uppercase;
-        color: #6B7280;
-        margin-bottom: 7px;
+    .field input[type="text"] {
+        width: 100%; height: 46px; background: var(--paper);
+        border: 1px solid var(--border); border-radius: 10px;
+        padding: 0 16px; font-family: 'Syne', sans-serif;
+        font-size: 13px; color: var(--ink); outline: none;
+        transition: all 0.2s; box-sizing: border-box;
     }
-    label .req { color: #DC2626; margin-left: 2px; }
+    .field input[type="text"]:focus {
+        border-color: var(--gold); background: #fff;
+        box-shadow: 0 0 0 3px rgba(184,146,74,0.12);
+    }
+    .field input[type="text"]::placeholder { color: #C0B9B0; }
+    .field-hint { font-family: 'Syne', sans-serif; font-size: 11px; color: var(--muted); margin-top: 6px; }
 
-    input[type="text"],
-    input[type="number"],
-    select {
-        width: 100%;
-        height: 46px;
-        background: #F8F7F5;
-        border: 1.5px solid #E5E3DF;
-        border-radius: 9px;
-        padding: 0 14px;
-        font-size: 14px;
-        font-family: 'DM Sans', sans-serif;
-        color: #1A1A2E;
-        outline: none;
-        transition: all 0.2s;
-        box-sizing: border-box;
+    .stepper-wrap {
+        display: flex; align-items: center;
+        border: 1px solid var(--border); border-radius: 10px;
+        overflow: hidden; background: var(--paper);
+        transition: border-color 0.2s, box-shadow 0.2s;
     }
+    .stepper-wrap:focus-within {
+        border-color: var(--gold); background: #fff;
+        box-shadow: 0 0 0 3px rgba(184,146,74,0.12);
+    }
+    .stepper-btn {
+        width: 46px; height: 46px; background: transparent; border: none;
+        font-size: 22px; font-weight: 300; color: var(--muted); cursor: pointer;
+        display: flex; align-items: center; justify-content: center;
+        transition: all 0.15s; flex-shrink: 0;
+    }
+    .stepper-btn:hover { background: rgba(184,146,74,0.1); color: var(--gold); }
+    .stepper-input {
+        flex: 1; height: 46px; background: transparent; border: none;
+        text-align: center; font-family: 'Cormorant Garamond', serif;
+        font-size: 22px; font-weight: 600; color: var(--ink);
+        outline: none; padding: 0; min-width: 0;
+    }
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; }
+    input[type=number] { -moz-appearance: textfield; }
 
-    select {
-        appearance: none;
-        background-image: url("data:image/svg+xml,%3Csvg width='11' height='7' viewBox='0 0 11 7' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5.5 6L10 1' stroke='%238B8FA8' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
-        background-repeat: no-repeat;
-        background-position: right 13px center;
-        padding-right: 34px;
-        cursor: pointer;
-    }
-
-    input:focus, select:focus {
-        border-color: #C9A96E;
-        background: #fff;
-        box-shadow: 0 0 0 3px rgba(201,169,110,0.12);
-    }
-
-    input::placeholder { color: #C4C0BB; }
-
-    .field-hint {
-        font-size: 11px; color: #9CA3AF; margin-top: 5px;
-    }
-
-    /* Rent field with suffix */
-    .input-suffix-wrap { position: relative; }
-    .input-suffix-wrap input { padding-right: 58px; }
-    .input-suffix {
-        position: absolute; right: 13px; top: 50%;
-        transform: translateY(-50%);
-        font-size: 10px; font-weight: 700;
-        color: #9CA3AF; pointer-events: none;
-        letter-spacing: 0.5px;
-    }
-
-    /* Status radio pills */
-    .status-grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 10px;
-    }
-    .status-radio { display: none; }
-    .status-pill {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 7px;
-        padding: 13px 8px;
-        border: 1.5px solid #E5E3DF;
-        border-radius: 9px;
-        cursor: pointer;
-        background: #F8F7F5;
-        transition: all 0.2s;
-        font-size: 12px;
-        font-weight: 600;
-        color: #6B7280;
-        text-align: center;
-        user-select: none;
-    }
-    .status-pill:hover { border-color: #C9A96E; background: #fff; color: #1A1A2E; }
-    .status-radio:checked + .status-pill {
-        border-color: #C9A96E;
-        background: rgba(201,169,110,0.07);
-        color: #1A1A2E;
-    }
-    .s-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
-
-    /* Errors */
     .err-block {
-        background: #FEF2F2;
-        border: 1px solid #FECACA;
-        border-radius: 9px;
-        padding: 12px 16px;
-        margin-bottom: 18px;
-        list-style: none;
+        background: var(--error-bg); border: 1px solid #FFCBC9;
+        border-radius: 10px; padding: 13px 16px;
+        margin-bottom: 20px; list-style: none;
     }
     .err-block li {
-        color: #DC2626; font-size: 13px;
-        display: flex; align-items: flex-start; gap: 6px;
+        font-family: 'Syne', sans-serif; color: var(--error);
+        font-size: 12.5px; display: flex; align-items: flex-start;
+        gap: 7px; margin-bottom: 4px;
     }
+    .err-block li:last-child { margin-bottom: 0; }
     .err-block li::before { content: '✕'; font-size: 10px; margin-top: 2px; flex-shrink: 0; }
 
-    /* Actions bar */
     .form-actions {
         display: flex; gap: 10px; align-items: center;
-        padding: 18px 24px;
-        border-top: 1px solid #EEECEA;
-        background: #FAFAF8;
+        padding: 18px 26px; border-top: 1px solid var(--border);
+        background: var(--paper);
     }
     .btn-save {
-        height: 42px;
-        background: #1A1A2E;
-        color: #C9A96E;
-        border: 1px solid #C9A96E;
-        border-radius: 8px;
-        padding: 0 22px;
-        font-size: 13px; font-weight: 600;
-        font-family: 'DM Sans', sans-serif;
-        cursor: pointer;
-        display: inline-flex; align-items: center; gap: 7px;
-        transition: all 0.2s;
+        height: 42px; background: var(--navy); color: var(--gold-lt);
+        border: 1px solid var(--gold); border-radius: 10px; padding: 0 24px;
+        font-family: 'Syne', sans-serif; font-size: 12.5px; font-weight: 600;
+        cursor: pointer; display: inline-flex; align-items: center; gap: 8px;
+        transition: all 0.2s; letter-spacing: 0.02em;
     }
-    .btn-save:hover { background: #C9A96E; color: #1A1A2E; }
+    .btn-save:hover {
+        background: var(--gold); color: var(--navy);
+        box-shadow: 0 4px 20px rgba(184,146,74,0.3); transform: translateY(-1px);
+    }
     .btn-cancel {
-        height: 42px;
-        background: transparent;
-        color: #6B7280;
-        border: 1.5px solid #E5E3DF;
-        border-radius: 8px;
-        padding: 0 18px;
-        font-size: 13px; font-weight: 500;
-        font-family: 'DM Sans', sans-serif;
-        cursor: pointer;
-        text-decoration: none;
-        display: inline-flex; align-items: center; gap: 7px;
-        transition: all 0.2s;
+        height: 42px; background: transparent; color: var(--muted);
+        border: 1px solid var(--border); border-radius: 10px; padding: 0 18px;
+        font-family: 'Syne', sans-serif; font-size: 12.5px; font-weight: 600;
+        cursor: pointer; text-decoration: none;
+        display: inline-flex; align-items: center; gap: 7px; transition: all 0.2s;
     }
-    .btn-cancel:hover { border-color: #1A1A2E; color: #1A1A2E; }
+    .btn-cancel:hover { border-color: var(--ink); color: var(--ink); background: var(--cream); }
 
-    /* Sidebar */
     .side-card {
-        background: #fff;
-        border: 1px solid #EEECEA;
-        border-radius: 12px;
-        overflow: hidden;
-        margin-bottom: 14px;
+        background: #fff; border: 1px solid var(--border);
+        border-radius: 14px; overflow: hidden; margin-bottom: 16px;
     }
+    .side-card:last-child { margin-bottom: 0; }
     .side-head {
-        padding: 14px 18px;
-        border-bottom: 1px solid #EEECEA;
-        font-size: 12px; font-weight: 700; color: #1A1A2E;
+        padding: 14px 18px; border-bottom: 1px solid var(--border);
+        font-family: 'Syne', sans-serif; font-size: 12px; font-weight: 700;
+        color: var(--ink); display: flex; align-items: center; gap: 8px;
     }
-    .side-body { padding: 16px 18px; }
+    .side-body { padding: 18px; }
+
+    .floor-viz { display: flex; flex-direction: column-reverse; gap: 4px; margin-bottom: 12px; }
+    .floor-bar {
+        height: 13px; border-radius: 4px;
+        background: linear-gradient(90deg, var(--navy), var(--navy-lt));
+        opacity: 0.1; transition: all 0.25s; align-self: center;
+    }
+    .floor-bar.active {
+        opacity: 1;
+        background: linear-gradient(90deg, var(--gold), var(--gold-lt));
+    }
+    .floor-label {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 15px; font-weight: 600; color: var(--ink); text-align: center;
+    }
+
     .tip {
-        display: flex; align-items: flex-start; gap: 9px;
-        margin-bottom: 12px; font-size: 12px;
-        color: #4B5563; line-height: 1.5;
+        display: flex; align-items: flex-start; gap: 10px;
+        margin-bottom: 14px; font-family: 'Syne', sans-serif;
+        font-size: 12px; color: #4B5563; line-height: 1.55;
     }
     .tip:last-child { margin-bottom: 0; }
     .tip-n {
-        width: 18px; height: 18px;
-        background: #1A1A2E; color: #C9A96E;
-        border-radius: 4px; font-size: 9px; font-weight: 700;
+        width: 20px; height: 20px; background: var(--navy); color: var(--gold-lt);
+        border-radius: 5px; font-size: 9px; font-weight: 700;
         display: flex; align-items: center; justify-content: center;
         flex-shrink: 0; margin-top: 1px;
     }
 </style>
 
 <div class="pg-header">
-    <div class="pg-title">Nouvel appartement</div>
-    <div class="pg-sub">Remplissez les informations ci-dessous pour créer l'appartement</div>
+    <div class="pg-title">Nouvel immeuble</div>
+    <div class="pg-sub">Remplissez les informations pour créer l'immeuble</div>
 </div>
 
-<form method="POST" action="{{ route('manager.apartments.store') }}">
+{{-- ✅ ROUTE CORRIGÉE --}}
+<form method="POST" action="{{ route('manager.buildings.store') }}">
 @csrf
 
 <div class="form-wrap">
 
-    {{-- MAIN CARD --}}
     <div class="fcard">
         <div class="fcard-head">
             <div class="fcard-icon">
-                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg width="16" height="16" fill="none" stroke="#D4AA6A" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
-                    <polyline stroke-linecap="round" stroke-linejoin="round" stroke-width="2" points="9,22 9,12 15,12 15,22"/>
+                        d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
                 </svg>
             </div>
             <div>
-                <div class="fcard-title">Informations générales</div>
-                <div class="fcard-sub">Identifiant, type, loyer et immeuble</div>
+                <div class="fcard-title">Informations de l'immeuble</div>
+                <div class="fcard-sub">Nom, adresse et structure</div>
             </div>
         </div>
 
@@ -271,122 +220,121 @@
                 </ul>
             @endif
 
-            <div class="field-row">
-                <div class="field">
-                    <label>Numéro <span class="req">*</span></label>
-                    <input type="text" name="number"
-                        placeholder="ex: 3B, A-205"
-                        value="{{ old('number') }}" required>
-                    <div class="field-hint">Identifiant unique dans l'immeuble</div>
-                </div>
-                <div class="field">
-                    <label>Type <span class="req">*</span></label>
-                    <select name="type" required>
-                        <option value="">— Choisir —</option>
-                        @foreach(['Studio','F1','F2','F3','F4','F5+','Duplex','Commerce'] as $t)
-                            <option value="{{ $t }}" {{ old('type') == $t ? 'selected' : '' }}>{{ $t }}</option>
-                        @endforeach
-                    </select>
-                </div>
-            </div>
-
-            <div class="field-row">
-                <div class="field">
-                    <label>Loyer mensuel <span class="req">*</span></label>
-                    <div class="input-suffix-wrap">
-                        <input type="number" name="rent_amount"
-                            placeholder="150 000"
-                            value="{{ old('rent_amount') }}"
-                            min="0" step="1000" required>
-                        <span class="input-suffix">FCFA</span>
-                    </div>
-                </div>
-                <div class="field">
-                    <label>Immeuble <span class="req">*</span></label>
-                    <select name="building_id" required>
-                        <option value="">— Choisir —</option>
-                        @foreach($buildings as $b)
-                            <option value="{{ $b->id }}" {{ old('building_id') == $b->id ? 'selected' : '' }}>
-                                {{ $b->name }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
+            <div class="field">
+                <label>Nom de l'immeuble <span class="req">*</span></label>
+                <input type="text" name="name"
+                    placeholder="ex : Résidence Les Acacias"
+                    value="{{ old('name') }}" required>
+                <div class="field-hint">Nom unique pour identifier l'immeuble dans votre portefeuille</div>
             </div>
 
             <div class="field">
-                <label>Statut <span class="req">*</span></label>
-                <div class="status-grid">
-                    <div>
-                        <input type="radio" name="status" id="sv" value="vacant"
-                            class="status-radio"
-                            {{ old('status', 'vacant') == 'vacant' ? 'checked' : '' }}>
-                        <label for="sv" class="status-pill">
-                            <span class="s-dot" style="background:#F59E0B"></span>
-                            Vacant
-                        </label>
-                    </div>
-                    <div>
-                        <input type="radio" name="status" id="so" value="occupé"
-                            class="status-radio"
-                            {{ old('status') == 'occupé' ? 'checked' : '' }}>
-                        <label for="so" class="status-pill">
-                            <span class="s-dot" style="background:#10B981"></span>
-                            Occupé
-                        </label>
-                    </div>
-                    <div>
-                        <input type="radio" name="status" id="st" value="en travaux"
-                            class="status-radio"
-                            {{ old('status') == 'en travaux' ? 'checked' : '' }}>
-                        <label for="st" class="status-pill">
-                            <span class="s-dot" style="background:#EF4444"></span>
-                            En travaux
-                        </label>
-                    </div>
+                <label>Adresse <span class="req">*</span></label>
+                <input type="text" name="address"
+                    placeholder="ex : 14 Rue Carnot, Plateau, Dakar"
+                    value="{{ old('address') }}" required>
+                <div class="field-hint">Adresse complète avec quartier et ville</div>
+            </div>
+
+            <div class="field">
+                <label>Nombre d'étages <span class="req">*</span></label>
+                <div class="stepper-wrap">
+                    <button type="button" class="stepper-btn" onclick="stepFloors(-1)">−</button>
+                    <input type="number" name="floors" id="floorsInput"
+                        class="stepper-input"
+                        value="{{ old('floors', 1) }}"
+                        min="1" max="50" required
+                        oninput="updateViz(this.value)">
+                    <button type="button" class="stepper-btn" onclick="stepFloors(1)">+</button>
                 </div>
+                <div class="field-hint">Rez-de-chaussée non compris — minimum 1 étage</div>
             </div>
 
         </div>
 
         <div class="form-actions">
             <button type="submit" class="btn-save">
-                <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
                 </svg>
-                Créer l'appartement
+                Créer l'immeuble
             </button>
-            <a href="{{ route('manager.apartments.index') }}" class="btn-cancel">Annuler</a>
+            {{-- ✅ ROUTE CORRIGÉE --}}
+            <a href="{{ route('manager.buildings.index') }}" class="btn-cancel">Annuler</a>
         </div>
     </div>
 
-    {{-- SIDEBAR --}}
     <div>
         <div class="side-card">
-            <div class="side-head">💡 Conseils</div>
+            <div class="side-head">
+                <svg width="13" height="13" fill="none" stroke="#B8924A" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10M12 3v18M5 7l7-4 7 4"/>
+                </svg>
+                Aperçu des étages
+            </div>
+            <div class="side-body">
+                <div class="floor-viz" id="floorViz"></div>
+                <div class="floor-label" id="floorLabel">1 étage</div>
+            </div>
+        </div>
+
+        <div class="side-card">
+            <div class="side-head">
+                <svg width="13" height="13" fill="none" stroke="#B8924A" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+                </svg>
+                Conseils
+            </div>
             <div class="side-body">
                 <div class="tip">
                     <div class="tip-n">1</div>
-                    <div>Numérotez clairement : <strong>A-101</strong>, <strong>3B</strong>. Évitez les espaces.</div>
+                    <div>Choisissez un nom court et mémorable, ex : <strong>Résidence Fann</strong>.</div>
                 </div>
                 <div class="tip">
                     <div class="tip-n">2</div>
-                    <div>Le loyer est modifiable ultérieurement sans impacter les baux existants.</div>
+                    <div>L'adresse complète facilite la localisation et les livraisons.</div>
                 </div>
                 <div class="tip">
                     <div class="tip-n">3</div>
-                    <div>Statut <strong>Vacant</strong> = appartement visible à la location.</div>
+                    <div>Vous pourrez ajouter des appartements après la création de l'immeuble.</div>
                 </div>
-            </div>
-        </div>
-        <div class="side-card">
-            <div class="side-head">📍 Immeuble sélectionné</div>
-            <div class="side-body" style="font-size:12px;color:#8B8FA8;">
-                Sélectionnez un immeuble dans le formulaire pour l'associer.
             </div>
         </div>
     </div>
 
 </div>
 </form>
+
+<script>
+    const MAX_BARS = 8;
+
+    function updateViz(val) {
+        const n = Math.max(1, Math.min(50, parseInt(val) || 1));
+        const viz = document.getElementById('floorViz');
+        const lbl = document.getElementById('floorLabel');
+        viz.innerHTML = '';
+        const show = Math.min(n, MAX_BARS);
+        for (let i = 0; i < MAX_BARS; i++) {
+            const bar = document.createElement('div');
+            bar.className = 'floor-bar' + (i < show ? ' active' : '');
+            const w = 50 + ((MAX_BARS - i - 1) / MAX_BARS) * 40;
+            bar.style.width = w + '%';
+            viz.appendChild(bar);
+        }
+        lbl.textContent = n + (n > MAX_BARS ? ' étages (affiché : ' + MAX_BARS + ')' : ' étage' + (n > 1 ? 's' : ''));
+    }
+
+    function stepFloors(delta) {
+        const input = document.getElementById('floorsInput');
+        const next = Math.max(1, Math.min(50, (parseInt(input.value) || 1) + delta));
+        input.value = next;
+        updateViz(next);
+    }
+
+    updateViz(document.getElementById('floorsInput').value);
+    document.getElementById('floorsInput').addEventListener('input', function() {
+        updateViz(this.value);
+    });
+</script>
+
 @endsection

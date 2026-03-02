@@ -10,16 +10,16 @@
         <p><strong>Adresse :</strong> {{ $building->address }}</p>
         <p><strong>Nombre d'étages :</strong> {{ $building->floors }}</p>
     </div>
-    <a href="{{ route('buildings.edit', $building) }}" class="btn btn-warning">Modifier</a>
-    <a href="{{ route('buildings.index') }}" class="btn btn-secondary">Retour à la liste</a>
+    <a href="{{ route('manager.buildings.edit', $building) }}" class="btn btn-warning">Modifier</a>
+    <a href="{{ route('manager.buildings.index') }}" class="btn btn-secondary">Retour à la liste</a>
 
     <hr>
     <h3>Appartements de cet immeuble</h3>
-    <a href="{{ route('apartments.create') }}?building_id={{ $building->id }}" class="btn btn-success mb-2">Ajouter un appartement</a>
+    <a href="{{ route('manager.apartments.create') }}?building_id={{ $building->id }}" class="btn btn-success mb-2">Ajouter un appartement</a>
     <ul class="list-group">
         @foreach($building->apartments ?? [] as $apartment)
             <li class="list-group-item">
-                <a href="{{ route('apartments.show', $apartment) }}">Appartement {{ $apartment->number }} - {{ $apartment->type }} ({{ $apartment->status }})</a>
+                <a href="{{ route('manager.apartments.show', $apartment) }}">Appartement {{ $apartment->number }} - {{ $apartment->type }} ({{ $apartment->status }})</a>
             </li>
         @endforeach
         @if(empty($building->apartments) || (is_object($building->apartments) && $building->apartments->isEmpty()))

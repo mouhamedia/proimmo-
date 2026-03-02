@@ -3,7 +3,7 @@
 @section('page-title', 'Détail immeuble')
 
 @section('breadcrumb')
-    <a href="{{ route('buildings.index') }}" style="color:#8B8FA8;text-decoration:none;transition:color 0.2s;"
+    <a href="{{ route('manager.buildings.index') }}" style="color:#8B8FA8;text-decoration:none;transition:color 0.2s;"
        onmouseover="this.style.color='#1A1A2E'" onmouseout="this.style.color='#8B8FA8'">Immeubles</a>
     &nbsp;/&nbsp;<span style="color:#1A1A2E;font-weight:600;">{{ $building->name }}</span>
 @endsection
@@ -363,7 +363,7 @@
 
 {{-- ══ ACTIONS ══ --}}
 <div class="page-actions">
-    <a href="{{ route('buildings.edit', $building->id) }}" class="btn-edit">
+    <a href="{{ route('manager.buildings.edit', $building->id) }}" class="btn-edit">
         <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
@@ -606,7 +606,7 @@
             <div class="danger-desc">
                 Suppression définitive. Tous les appartements liés seront aussi supprimés.
             </div>
-            <form method="POST" action="{{ route('buildings.destroy', $building->id) }}"
+            <form method="POST" action="{{ route('manager.buildings.destroy', $building->id) }}"
                   onsubmit="return confirm('Supprimer définitivement « {{ addslashes($building->name) }} » et tous ses appartements ?')">
                 @csrf @method('DELETE')
                 <button type="submit" class="btn-danger">

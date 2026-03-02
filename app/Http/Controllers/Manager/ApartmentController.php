@@ -54,7 +54,7 @@ class ApartmentController extends Controller
         })->findOrFail($id);
         $validated = $request->validated();
         $apartment->update($validated);
-        return redirect()->route('apartments.index')->with('success', 'Appartement modifié');
+        return redirect()->route('manager.apartments.index')->with('success', 'Appartement modifié');
     }
 
     // Supprime un appartement
@@ -65,6 +65,6 @@ class ApartmentController extends Controller
             $q->where('residence_id', $residenceId);
         })->findOrFail($id);
         $apartment->delete();
-        return redirect()->route('apartments.index')->with('success', 'Appartement supprimé');
+        return redirect()->route('manager.apartments.index')->with('success', 'Appartement supprimé');
     }
 }

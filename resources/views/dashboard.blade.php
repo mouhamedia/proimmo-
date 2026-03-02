@@ -314,7 +314,7 @@
 
 <div class="quick-row">
     @if(Route::has('buildings.create'))
-    <a href="{{ route('buildings.create') }}" class="quick-btn">
+    <a href="{{ route('manager.buildings.create') }}" class="quick-btn">
         <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/>
         </svg>
@@ -339,7 +339,7 @@
     </a>
     @endif
     @if(Route::has('buildings.index'))
-    <a href="{{ route('buildings.index') }}" class="quick-btn">
+    <a href="{{ route('manager.buildings.index') }}" class="quick-btn">
         <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5"/>

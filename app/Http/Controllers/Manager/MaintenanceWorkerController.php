@@ -26,12 +26,27 @@ class MaintenanceWorkerController extends Controller
             'name' => 'required',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|min:6',
+            'competence' => 'required|in:maçon,plombier,autre',
         ]);
         $validated['role'] = 'maintenance';
         $validated['residence_id'] = \Auth::user()->residence_id;
         $validated['password'] = bcrypt($validated['password']);
-        User::create($validated);
-        return redirect()->route('manager.maintenance_workers.index')->with('success', 'Maintenancier créé');
+        $user = User::create($validated);
+
+        // Génération du code unique
+        do {
+            $code = '#'.str_pad(random_int(1, 9999), 4, '0', STR_PAD_LEFT);
+        } while (\App\Models\Technician::where('code', $code)->exists());
+
+        // Création du technicien avec compétence et code
+        \App\Models\Technician::create([
+            'user_id' => $user->id,
+            'code' => $code,
+            'competence' => $validated['competence'],
+        ]);
+
+        // Redirection avec le code généré
+        return redirect()->route('manager.maintenance_workers.index')->with('success', 'Maintenancier créé. Code d\'accès : '.$code);
     }
 
     public function edit($id)

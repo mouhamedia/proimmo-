@@ -3,7 +3,7 @@
 @section('page-title', 'Créer un immeuble')
 
 @section('breadcrumb')
-    <a href="{{ route('buildings.index') }}" style="color:#8B8FA8;text-decoration:none;transition:color 0.2s;"
+    <a href="{{ route('manager.buildings.index') }}" style="color:#8B8FA8;text-decoration:none;transition:color 0.2s;"
        onmouseover="this.style.color='#1A1A2E'" onmouseout="this.style.color='#8B8FA8'">Immeubles</a>
     &nbsp;/&nbsp;<span>Nouveau</span>
 @endsection
@@ -205,7 +205,7 @@
     <div class="pg-sub">Remplissez les informations pour créer l'immeuble</div>
 </div>
 
-<form method="POST" action="{{ route('buildings.store') }}">
+<form method="POST" action="{{ route('manager.buildings.store') }}">
 @csrf
 
 <div class="form-wrap">
@@ -274,7 +274,7 @@
                 </svg>
                 Créer l'immeuble
             </button>
-            <a href="{{ route('buildings.index') }}" class="btn-cancel">Annuler</a>
+            <a href="{{ route('manager.buildings.index') }}" class="btn-cancel">Annuler</a>
         </div>
     </div>
 

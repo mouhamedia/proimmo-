@@ -210,7 +210,7 @@
         <div class="pg-title">Immeubles</div>
         <div class="pg-sub">Gérez l'ensemble de votre parc immobilier</div>
     </div>
-    <a href="{{ route('buildings.create') }}" class="btn-add">
+    <a href="{{ route('manager.buildings.create') }}" class="btn-add">
         <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/>
         </svg>
@@ -283,7 +283,7 @@
             </div>
             <div class="empty-title">Aucun immeuble enregistré</div>
             <div class="empty-sub">Commencez par créer votre premier immeuble.</div>
-            <a href="{{ route('buildings.create') }}" class="btn-add" style="display:inline-flex;">
+            <a href="{{ route('manager.buildings.create') }}" class="btn-add" style="display:inline-flex;">
                 <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/>
                 </svg>
@@ -354,20 +354,20 @@
                     <td>
                         <div class="actions">
                             @if(Route::has('buildings.show'))
-                            <a href="{{ route('buildings.show', $building) }}" class="act-btn view" title="Voir">
+                            <a href="{{ route('manager.buildings.show', $building) }}" class="act-btn view" title="Voir">
                                 <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
                                 </svg>
                             </a>
                             @endif
-                            <a href="{{ route('buildings.edit', $building) }}" class="act-btn edit" title="Modifier">
+                            <a href="{{ route('manager.buildings.edit', $building) }}" class="act-btn edit" title="Modifier">
                                 <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                                 </svg>
                             </a>
-                            <form method="POST" action="{{ route('buildings.destroy', $building) }}"
+                            <form method="POST" action="{{ route('manager.buildings.destroy', $building) }}"
                                   onsubmit="return confirm('Supprimer l\'immeuble {{ addslashes($building->name) }} ?')">
                                 @csrf @method('DELETE')
                                 <button type="submit" class="act-btn del" title="Supprimer">

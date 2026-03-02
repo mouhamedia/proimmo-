@@ -386,6 +386,8 @@
         </div>
     </div>
 
+</form>
+
     {{-- SIDEBAR --}}
     <div>
         {{-- Current info --}}
@@ -434,5 +436,4 @@
     </div>
 
 </div>
-</form>
 @endsection

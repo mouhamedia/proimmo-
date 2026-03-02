@@ -292,6 +292,8 @@
         </div>
     </div>
 
+</form>
+
     {{-- SIDEBAR --}}
     <div>
 
@@ -364,7 +366,6 @@
     </div>
 
 </div>
-</form>
 
 <script>
     function togglePw() {
