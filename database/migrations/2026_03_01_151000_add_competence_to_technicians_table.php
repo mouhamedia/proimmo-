@@ -7,13 +7,17 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::table('technicians', function (Blueprint $table) {
-            $table->string('competence')->after('code');
+            if (!Schema::hasColumn('technicians', 'competence')) {
+                $table->string('competence')->after('code');
+            }
         });
     }
     public function down(): void
     {
         Schema::table('technicians', function (Blueprint $table) {
-            $table->dropColumn('competence');
+            if (Schema::hasColumn('technicians', 'competence')) {
+                $table->dropColumn('competence');
+            }
         });
     }
 };
