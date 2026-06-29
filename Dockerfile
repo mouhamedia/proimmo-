@@ -14,7 +14,7 @@ RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - && \
 COPY --from=composer:2.7 /usr/bin/composer /usr/bin/composer
 ENV COMPOSER_ALLOW_SUPERUSER=1
 
-# 4. Config PHP pour Laravel (cookies + session)
+# 4. Config PHP pour Laravel
 RUN echo "output_buffering = 4096" > /usr/local/etc/php/conf.d/laravel.ini \
  && echo "session.cookie_samesite = Lax" >> /usr/local/etc/php/conf.d/laravel.ini
 
@@ -23,7 +23,7 @@ WORKDIR /var/www
 # 5. Copier les fichiers
 COPY . .
 
-# 6. Nettoyer et Installer
+# 6. Installer les dépendances et builder les assets
 RUN rm -rf node_modules vendor && \
     composer install --no-interaction --prefer-dist --optimize-autoloader && \
     npm install && \
@@ -31,5 +31,9 @@ RUN rm -rf node_modules vendor && \
 
 RUN chown -R www-data:www-data /var/www && chmod -R 755 /var/www
 
+# 7. Script d'entrée
+COPY docker/entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
 EXPOSE 9000
-CMD ["php-fpm"]
+ENTRYPOINT ["/entrypoint.sh"]
