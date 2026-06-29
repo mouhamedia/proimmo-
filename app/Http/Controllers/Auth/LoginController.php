@@ -31,6 +31,8 @@ class LoginController extends Controller
                 return redirect('/tenant/dashboard');
             } elseif ($role === 'manager') {
                 return redirect('/manager/dashboard');
+            } elseif ($role === 'technician') {
+                return redirect('/technician/dashboard');
             } else {
                 return redirect('/');
             }

@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('page-title', 'Espace Locataire') — ImmoApp</title>
+    <title>@yield('page-title', 'Espace Technicien') — ImmoApp</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
         :root {
             --sidebar-w: 240px;
-            --teal: #0D9488;
-            --teal-light: #CCFBF1;
+            --orange: #EA580C;
+            --orange-light: #FED7AA;
             --dark: #1A1A2E;
             --text-muted: #8B8FA8;
             --surface: #F8F7F5;
@@ -28,11 +28,11 @@
             overflow-y: auto; overflow-x: hidden;
         }
         .sidebar::-webkit-scrollbar { width: 3px; }
-        .sidebar::-webkit-scrollbar-thumb { background: rgba(13,148,136,0.3); border-radius: 10px; }
+        .sidebar::-webkit-scrollbar-thumb { background: rgba(234,88,12,0.3); border-radius: 10px; }
 
         .sidebar-brand { padding: 28px 24px 20px; border-bottom: 1px solid rgba(255,255,255,0.06); }
         .brand-logo { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
-        .brand-icon { width: 36px; height: 36px; background: var(--teal); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+        .brand-icon { width: 36px; height: 36px; background: var(--orange); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
         .brand-name { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 600; color: #fff; }
         .brand-tagline { font-size: 10px; font-weight: 300; color: var(--text-muted); letter-spacing: 2px; text-transform: uppercase; padding-left: 46px; }
 
@@ -42,20 +42,20 @@
             display: flex; align-items: center; gap: 11px; padding: 9px 10px;
             border-radius: 9px; text-decoration: none; color: rgba(255,255,255,0.55);
             font-size: 13px; font-weight: 400; margin-bottom: 2px; transition: all 0.2s;
-            position: relative; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+            position: relative;
         }
         .nav-item:hover { background: rgba(255,255,255,0.05); color: #fff; }
-        .nav-item.active { background: rgba(13,148,136,0.15); color: var(--teal-light); }
+        .nav-item.active { background: rgba(234,88,12,0.15); color: var(--orange-light); }
         .nav-item.active::before {
             content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%);
-            width: 3px; height: 60%; background: var(--teal); border-radius: 0 4px 4px 0;
+            width: 3px; height: 60%; background: var(--orange); border-radius: 0 4px 4px 0;
         }
         .nav-icon { width: 18px; height: 18px; opacity: 0.7; flex-shrink: 0; }
         .nav-item.active .nav-icon, .nav-item:hover .nav-icon { opacity: 1; }
 
         .sidebar-user { padding: 12px; border-top: 1px solid rgba(255,255,255,0.06); }
         .user-card { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 9px; }
-        .user-avatar { width: 34px; height: 34px; background: linear-gradient(135deg, var(--teal), #0891B2); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; color: #fff; flex-shrink: 0; }
+        .user-avatar { width: 34px; height: 34px; background: linear-gradient(135deg, var(--orange), #DC2626); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; color: #fff; flex-shrink: 0; }
         .user-info { flex: 1; min-width: 0; }
         .user-name { font-size: 12px; font-weight: 500; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .user-role { font-size: 10px; color: var(--text-muted); }
@@ -87,7 +87,7 @@
             .mobile-menu-btn { display: flex !important; }
         }
         .mobile-menu-btn { display: none; }
-        ::-webkit-scrollbar { width: 5px; height: 5px; }
+        ::-webkit-scrollbar { width: 5px; }
         ::-webkit-scrollbar-thumb { background: #D4CDC6; border-radius: 10px; }
     </style>
 </head>
@@ -97,17 +97,17 @@
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-brand">
             <div class="brand-logo">
-                <div class="brand-icon">🏠</div>
+                <div class="brand-icon">🔧</div>
                 <span class="brand-name">ImmoApp</span>
             </div>
-            <div class="brand-tagline">Espace locataire</div>
+            <div class="brand-tagline">Espace technicien</div>
         </div>
 
         <nav class="sidebar-nav">
             <div class="nav-section-label">Menu</div>
 
-            <a href="{{ route('tenant.dashboard') }}"
-               class="nav-item {{ request()->routeIs('tenant.dashboard') ? 'active' : '' }}">
+            <a href="{{ route('technician.dashboard') }}"
+               class="nav-item {{ request()->routeIs('technician.dashboard') ? 'active' : '' }}">
                 <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
                         d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
@@ -115,33 +115,25 @@
                 Tableau de bord
             </a>
 
-            <a href="{{ route('tenant.tickets.index') }}"
-               class="nav-item {{ request()->routeIs('tenant.tickets.*') ? 'active' : '' }}">
+            <a href="{{ route('technician.tickets.index') }}"
+               class="nav-item {{ request()->routeIs('technician.tickets.*') ? 'active' : '' }}">
                 <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
-                        d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                        d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                 </svg>
-                Mes tickets
-            </a>
-
-            <a href="{{ route('tenant.payments.index') }}"
-               class="nav-item {{ request()->routeIs('tenant.payments.*') ? 'active' : '' }}">
-                <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
-                        d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
-                </svg>
-                Mes paiements
+                Mes interventions
             </a>
         </nav>
 
         <div class="sidebar-user">
             <div class="user-card">
                 <div class="user-avatar">
-                    {{ strtoupper(substr(auth()->user()->name ?? 'U', 0, 1)) }}
+                    {{ strtoupper(substr(auth()->user()->name ?? 'T', 0, 1)) }}
                 </div>
                 <div class="user-info">
-                    <div class="user-name">{{ auth()->user()->name ?? 'Locataire' }}</div>
-                    <div class="user-role">Locataire</div>
+                    <div class="user-name">{{ auth()->user()->name ?? 'Technicien' }}</div>
+                    <div class="user-role">Technicien</div>
                 </div>
                 <form method="POST" action="{{ route('logout') }}" style="margin:0;">
                     @csrf
@@ -166,7 +158,7 @@
                 </button>
                 <div>
                     <div class="page-title-bar">@yield('page-title', 'Tableau de bord')</div>
-                    <div class="breadcrumb">@yield('breadcrumb', 'Espace locataire')</div>
+                    <div class="breadcrumb">@yield('breadcrumb', 'Espace technicien')</div>
                 </div>
             </div>
             <div class="topbar-right">

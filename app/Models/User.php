@@ -103,6 +103,12 @@ class User extends Authenticatable
         return $this->hasMany(Ticket::class, 'technician_id');
     }
 
+    // Profil technicien
+    public function technician()
+    {
+        return $this->hasOne(Technician::class, 'user_id');
+    }
+
     // Un gestionnaire a plusieurs abonnements
     public function subscriptions()
     {

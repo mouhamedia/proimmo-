@@ -21,7 +21,7 @@ class CodeLoginController extends Controller
         $user = $tech->user;
         if ($user) {
             Auth::login($user);
-            return redirect()->route('dashboard');
+            return redirect()->route('technician.dashboard');
         }
         return redirect()->back()->with('error', 'Utilisateur associé non trouvé.');
     }

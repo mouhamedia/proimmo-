@@ -1,25 +1,57 @@
 <?php
+
 namespace App\Http\Controllers\Tenant;
 
 use App\Http\Controllers\Controller;
+use App\Models\Ticket;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class TicketController extends Controller
 {
-    // Liste des tickets
     public function index()
     {
-        // ...tickets locataire...
+        $tickets = Ticket::where('tenant_id', Auth::id())
+            ->latest()
+            ->get();
+
+        return view('tenant.tickets', compact('tickets'));
     }
 
-    // Formulaire création ticket
     public function create()
     {
-        // ...form create ticket...
+        $apartment = Auth::user()->apartment;
+
+        if (!$apartment) {
+            return redirect()->route('tenant.dashboard')
+                ->with('error', 'Vous n\'avez pas d\'appartement assigné.');
+        }
+
+        return view('tenant.tickets_create', compact('apartment'));
     }
 
-    // Enregistre un ticket
-    public function store()
+    public function store(Request $request)
     {
-        // ...store ticket...
+        $request->validate([
+            'description' => 'required|string|min:10|max:500',
+        ]);
+
+        $user = Auth::user();
+        $apartment = $user->apartment;
+
+        if (!$apartment) {
+            return redirect()->route('tenant.dashboard')
+                ->with('error', 'Aucun appartement assigné.');
+        }
+
+        Ticket::create([
+            'tenant_id'    => $user->id,
+            'apartment_id' => $apartment->id,
+            'description'  => $request->description,
+            'status'       => 'open',
+        ]);
+
+        return redirect()->route('tenant.tickets.index')
+            ->with('success', 'Votre ticket a été soumis avec succès.');
     }
 }
