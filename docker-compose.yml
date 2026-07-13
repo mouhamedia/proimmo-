@@ -23,8 +23,8 @@ services:
       DB_HOST: proimmo-db
       DB_PORT: '3306'
       DB_DATABASE: proimmo
-      DB_USERNAME: root
-      DB_PASSWORD: 'yes'
+      DB_USERNAME: proimmo
+      DB_PASSWORD: proimmo_password
       # Session / Cache
       SESSION_DRIVER: file
       SESSION_LIFETIME: '120'
@@ -54,8 +54,10 @@ services:
     environment:
       MYSQL_DATABASE: proimmo
       MYSQL_ROOT_PASSWORD: 'yes'
+      MYSQL_USER: proimmo
+      MYSQL_PASSWORD: proimmo_password
     volumes:
-      - proimmo_dbdata:/var/lib/mysql
+      - proimmo_dbdata_v2:/var/lib/mysql
     networks:
       - proimmo-network
     healthcheck:
@@ -71,4 +73,4 @@ networks:
 
 # ── Volume pour persistance MySQL ──
 volumes:
-  proimmo_dbdata:
+  proimmo_dbdata_v2:

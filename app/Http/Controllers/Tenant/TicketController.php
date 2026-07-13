@@ -32,7 +32,7 @@ class TicketController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'description' => 'required|string|min:10|max:500',
         ]);
 
@@ -47,7 +47,7 @@ class TicketController extends Controller
         Ticket::create([
             'tenant_id'    => $user->id,
             'apartment_id' => $apartment->id,
-            'description'  => $request->description,
+            'description'  => $validated['description'],
             'status'       => 'open',
         ]);
 

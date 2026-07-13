@@ -13,24 +13,24 @@
     /* ── Layout ── */
     .detail-layout {
         display: grid;
-        grid-template-columns: 1fr 300px;
+        grid-template-columns: minmax(0, 1fr) 300px;
         gap: 24px;
         align-items: start;
     }
-    @media (max-width: 900px) { .detail-layout { grid-template-columns: 1fr; } }
+    @media (max-width: 900px) { .detail-layout { grid-template-columns: 1fr; gap: 18px; } }
 
     /* ── Hero header ── */
     .building-hero {
         background: #1A1A2E;
         border-radius: 16px;
-        padding: 32px;
+        padding: 28px;
         margin-bottom: 24px;
         position: relative;
         overflow: hidden;
         display: flex;
         align-items: flex-end;
         justify-content: space-between;
-        gap: 20px;
+        gap: 24px;
         flex-wrap: wrap;
     }
 
@@ -79,9 +79,11 @@
     .hero-address svg { color: #C9A96E; flex-shrink: 0; }
 
     .hero-stats {
-        display: flex; gap: 12px;
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 12px;
         position: relative; z-index: 1;
-        flex-wrap: wrap;
+        width: min(100%, 520px);
     }
 
     .hero-stat {
@@ -90,7 +92,7 @@
         border-radius: 10px;
         padding: 12px 18px;
         text-align: center;
-        min-width: 80px;
+        min-width: 0;
     }
 
     .hero-stat-val {
@@ -293,13 +295,15 @@
 
     /* Danger */
     .danger-zone {
-        background: #FEF2F2; border: 1px solid #FEE2E2;
-        border-radius: 12px; padding: 14px 16px;
+        background: linear-gradient(180deg, #FFF7F7 0%, #FFF1F1 100%);
+        border: 1px solid #FECACA;
+        border-radius: 12px;
+        padding: 14px 16px;
     }
     .danger-title { font-size: 11px; font-weight: 700; color: #991B1B; margin-bottom: 4px; }
     .danger-desc  { font-size: 11px; color: #B91C1C; line-height: 1.5; margin-bottom: 10px; }
     .btn-danger {
-        width: 100%; height: 34px;
+        width: 100%; min-height: 40px;
         background: transparent; color: #DC2626;
         border: 1.5px solid #DC2626; border-radius: 7px;
         font-size: 11px; font-weight: 600;
@@ -309,6 +313,41 @@
         transition: all 0.2s;
     }
     .btn-danger:hover { background: #DC2626; color: #fff; }
+
+    @media (max-width: 1200px) {
+        .building-hero { padding: 24px; }
+        .hero-stats { width: 100%; }
+    }
+
+    @media (max-width: 900px) {
+        .building-hero { align-items: stretch; }
+        .hero-left { width: 100%; }
+        .hero-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); width: 100%; }
+        .card-head, .card-body, .side-head, .side-body { padding-left: 16px; padding-right: 16px; }
+        .page-actions { gap: 8px; }
+        .btn-edit, .btn-add-apt { flex: 1 1 220px; justify-content: center; }
+    }
+
+    @media (max-width: 640px) {
+        .building-hero { padding: 20px; margin-bottom: 18px; }
+        .hero-name { font-size: 24px; }
+        .hero-address { font-size: 12px; line-height: 1.5; }
+        .hero-stats { grid-template-columns: 1fr 1fr; gap: 10px; }
+        .hero-stat { padding: 10px 12px; }
+        .hero-stat-val { font-size: 20px; }
+        .page-actions { margin-bottom: 18px; }
+        .btn-edit, .btn-add-apt { width: 100%; flex: 1 1 100%; }
+        .card { margin-bottom: 16px; }
+        .card-head { flex-direction: column; align-items: flex-start; }
+        .card-head-left { width: 100%; }
+        .card-count { margin-left: auto; }
+        .info-grid { gap: 12px; }
+        .occ-label { flex-direction: column; align-items: flex-start; gap: 4px; }
+        table { min-width: 560px; }
+        .side-card { margin-bottom: 12px; }
+        .danger-zone { padding: 12px 14px; }
+        .btn-danger { min-height: 42px; font-size: 12px; }
+    }
 </style>
 
 {{-- ══ HERO ══ --}}

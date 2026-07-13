@@ -188,11 +188,16 @@
         ══════════════════════════════════ */
         .hero {
             min-height: 100vh;
-            background: var(--sand);
+            background:
+                radial-gradient(circle at top right, rgba(232,132,90,0.14), transparent 28%),
+                radial-gradient(circle at left bottom, rgba(212,168,83,0.12), transparent 30%),
+                var(--sand);
             display: grid;
             grid-template-columns: 1fr 1fr;
             position: relative;
             overflow: hidden;
+            --mx: 0px;
+            --my: 0px;
         }
 
         /* Texture overlay */
@@ -204,6 +209,55 @@
             pointer-events: none;
         }
 
+        .hero::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(140deg, rgba(255,255,255,0.34), transparent 32%, rgba(13,17,23,0.03));
+            pointer-events: none;
+        }
+
+        .hero-grid {
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(13,17,23,0.035) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(13,17,23,0.035) 1px, transparent 1px);
+            background-size: 72px 72px;
+            mask-image: linear-gradient(180deg, rgba(0,0,0,0.32), transparent 86%);
+            opacity: 0.7;
+            pointer-events: none;
+            z-index: 0;
+            transform: translate3d(calc(var(--mx) * 0.06), calc(var(--my) * 0.06), 0);
+            transition: transform 140ms linear;
+        }
+
+        .hero-orb {
+            position: absolute;
+            border-radius: 999px;
+            filter: blur(22px);
+            pointer-events: none;
+            z-index: 1;
+            animation: orbFloat 16s ease-in-out infinite;
+        }
+        .orb-a {
+            top: 9%;
+            right: 7%;
+            width: 240px;
+            height: 240px;
+            background: radial-gradient(circle, rgba(232,132,90,0.32), rgba(232,132,90,0));
+            transform: translate(calc(var(--mx) * -0.28), calc(var(--my) * -0.28));
+        }
+        .orb-b {
+            left: 4%;
+            bottom: 8%;
+            width: 190px;
+            height: 190px;
+            background: radial-gradient(circle, rgba(212,168,83,0.24), rgba(212,168,83,0));
+            animation-delay: -5s;
+            transform: translate(calc(var(--mx) * 0.18), calc(var(--my) * 0.18));
+        }
+
         .hero-left {
             display: flex;
             flex-direction: column;
@@ -212,6 +266,21 @@
             position: relative;
             z-index: 2;
         }
+
+        .hero-left .hero-eyebrow,
+        .hero-left .hero-title,
+        .hero-left .hero-sub,
+        .hero-left .hero-cta,
+        .hero-left .hero-trust {
+            opacity: 0;
+            transform: translateY(18px);
+            animation: heroRise 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+        .hero-left .hero-eyebrow { animation-delay: 0.05s; }
+        .hero-left .hero-title { animation-delay: 0.16s; }
+        .hero-left .hero-sub { animation-delay: 0.28s; }
+        .hero-left .hero-cta { animation-delay: 0.40s; }
+        .hero-left .hero-trust { animation-delay: 0.52s; }
 
         .hero-eyebrow {
             display: inline-flex;
@@ -298,6 +367,7 @@
             position: relative;
             width: 100%;
             max-width: 460px;
+            animation: heroRise 1s cubic-bezier(0.22, 1, 0.36, 1) both 0.24s, floatY 8.5s ease-in-out infinite 1.2s;
         }
 
         .mockup-card {
@@ -307,10 +377,11 @@
             color: var(--white);
             box-shadow: 0 40px 80px rgba(13,17,23,0.25), 0 0 0 1px rgba(255,255,255,0.05);
             transform: perspective(1000px) rotateY(-4deg) rotateX(2deg);
-            transition: transform 0.5s ease;
+            transition: transform 0.5s ease, box-shadow 0.5s ease;
         }
         .mockup-card:hover {
-            transform: perspective(1000px) rotateY(-1deg) rotateX(0deg);
+            transform: perspective(1000px) rotateY(-1deg) rotateX(0deg) translateY(-4px);
+            box-shadow: 0 48px 96px rgba(13,17,23,0.28), 0 0 0 1px rgba(255,255,255,0.08);
         }
 
         .mockup-header {
@@ -1009,8 +1080,115 @@
             opacity: 0;
             transform: translateY(24px);
             transition: opacity 0.6s ease, transform 0.6s ease;
+            will-change: opacity, transform;
         }
         .fade-in.visible { opacity: 1; transform: translateY(0); }
+
+        @media (max-width: 768px) {
+            .fade-in {
+                transform: translateY(16px);
+                transition-duration: 0.45s;
+            }
+
+            .hero {
+                background:
+                    radial-gradient(circle at top right, rgba(232,132,90,0.11), transparent 26%),
+                    radial-gradient(circle at left bottom, rgba(212,168,83,0.10), transparent 30%),
+                    var(--sand);
+            }
+
+            .hero-grid,
+            .hero-orb {
+                display: none;
+            }
+
+            .mockup-card {
+                transform: none;
+            }
+
+            .mockup-card:hover {
+                transform: none;
+            }
+
+            .float-card {
+                animation-duration: 4.5s;
+            }
+        }
+
+        @media (hover: none) and (pointer: coarse) {
+            .btn-primary:hover,
+            .btn-outline:hover,
+            .btn-cta-white:hover,
+            .btn-cta-ghost:hover,
+            .pay-card:hover,
+            .feat-card:hover,
+            .adv-card:hover,
+            .price-card:hover,
+            .mockup-card:hover {
+                transform: none;
+                box-shadow: none;
+            }
+
+            .fc-payment,
+            .fc-alert {
+                animation-duration: 4.8s;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            html {
+                scroll-behavior: auto;
+            }
+
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+                scroll-behavior: auto !important;
+            }
+
+            .fade-in {
+                opacity: 1;
+                transform: none;
+            }
+
+            .fc-payment,
+            .fc-alert,
+            .hero-eyebrow::before,
+            .mockup-wrap,
+            .hero-orb {
+                animation: none !important;
+            }
+        }
+
+        @keyframes heroRise {
+            from {
+                opacity: 0;
+                transform: translateY(18px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes floatY {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        @keyframes orbFloat {
+            0%, 100% {
+                transform: translate3d(calc(var(--mx) * 0.18), calc(var(--my) * 0.18), 0) scale(1);
+            }
+            50% {
+                transform: translate3d(calc(var(--mx) * 0.18), calc(var(--my) * 0.18 - 12px), 0) scale(1.05);
+            }
+        }
     </style>
 </head>
 <body>
@@ -1052,6 +1230,9 @@
 
 <!-- ════════ HERO ════════ -->
 <section class="hero">
+    <div class="hero-grid"></div>
+    <div class="hero-orb orb-a"></div>
+    <div class="hero-orb orb-b"></div>
     <div class="hero-left fade-in">
         <div class="hero-eyebrow">Plateforme SaaS — Sénégal</div>
 
@@ -1664,11 +1845,54 @@
     });
 
     // Scroll reveal
-    const observer = new IntersectionObserver(entries => {
-        entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); } });
-    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const isCompactViewport = window.matchMedia('(max-width: 768px)').matches;
 
-    document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+    if (prefersReducedMotion) {
+        document.documentElement.classList.add('reduce-motion');
+        document.querySelectorAll('.fade-in').forEach(el => el.classList.add('visible'));
+    } else {
+        const observer = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, {
+            threshold: isCompactViewport ? 0.08 : 0.12,
+            rootMargin: isCompactViewport ? '0px 0px -8px 0px' : '0px 0px -40px 0px'
+        });
+
+        document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+    }
+
+    const hero = document.querySelector('.hero');
+    const canParallax = window.matchMedia('(hover: hover) and (pointer: fine)').matches && !prefersReducedMotion;
+
+    if (hero && canParallax) {
+        let rafId = null;
+
+        hero.addEventListener('pointermove', (event) => {
+            const rect = hero.getBoundingClientRect();
+            const x = ((event.clientX - rect.left) / rect.width - 0.5) * 2;
+            const y = ((event.clientY - rect.top) / rect.height - 0.5) * 2;
+
+            if (rafId) {
+                cancelAnimationFrame(rafId);
+            }
+
+            rafId = requestAnimationFrame(() => {
+                hero.style.setProperty('--mx', `${x * 24}px`);
+                hero.style.setProperty('--my', `${y * 24}px`);
+            });
+        }, { passive: true });
+
+        hero.addEventListener('pointerleave', () => {
+            hero.style.setProperty('--mx', '0px');
+            hero.style.setProperty('--my', '0px');
+        }, { passive: true });
+    }
 </script>
 
 </body>

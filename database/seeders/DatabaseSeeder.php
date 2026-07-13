@@ -29,6 +29,7 @@ class DatabaseSeeder extends Seeder
             \Database\Seeders\BuildingSeeder::class,
             \Database\Seeders\ApartmentSeeder::class,
             \Database\Seeders\TenantSeeder::class,
+            \Database\Seeders\DemoUsersSeeder::class,
             \Database\Seeders\PlanSeeder::class,
             \Database\Seeders\AdminSeeder::class,
             \Database\Seeders\ManagerSeeder::class,

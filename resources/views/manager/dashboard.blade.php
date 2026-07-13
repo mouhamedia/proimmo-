@@ -49,6 +49,25 @@
     }
     .hero-sub { font-size: 13px; color: rgba(255,255,255,0.4); }
 
+    .hero-meta {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-top: 16px;
+    }
+    .hero-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 12px;
+        border-radius: 999px;
+        background: rgba(255,255,255,0.08);
+        border: 1px solid rgba(255,255,255,0.12);
+        color: rgba(255,255,255,0.82);
+        font-size: 12px;
+        font-weight: 600;
+    }
+
     .hero-date {
         position: relative; z-index: 1;
         background: rgba(255,255,255,0.05);
@@ -123,6 +142,16 @@
     }
     .stat-val.small { font-size: 20px; }
     .stat-lbl { font-size: 12px; color: #8B8FA8; }
+
+    .stat-helper {
+        margin-top: 8px;
+        font-size: 12px;
+        color: #6B7280;
+        line-height: 1.5;
+    }
+    .stat-helper.good { color: #059669; }
+    .stat-helper.warn { color: #D97706; }
+    .stat-helper.bad { color: #DC2626; }
 
     /* ── Two-col layout ── */
     .main-grid {
@@ -279,6 +308,26 @@
         white-space: nowrap;
     }
 
+    .ticket-item {
+        display: flex; align-items: flex-start; gap: 10px;
+        padding: 11px 16px; border-bottom: 1px solid #F5F3F1;
+        transition: background 0.12s;
+    }
+    .ticket-item:last-child { border-bottom: none; }
+    .ticket-item:hover { background: #FAFAF8; }
+    .ticket-dot {
+        width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 4px;
+    }
+    .ticket-main { flex: 1; min-width: 0; }
+    .ticket-title { font-size: 12px; font-weight: 600; color: #1A1A2E; }
+    .ticket-desc { font-size: 10px; color: #8B8FA8; margin-top: 2px; }
+    .ticket-status {
+        font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 20px; white-space: nowrap;
+    }
+    .ticket-status.open { background: #FEF2F2; color: #DC2626; }
+    .ticket-status.in_progress { background: #FFFBEB; color: #D97706; }
+    .ticket-status.closed { background: #ECFDF5; color: #059669; }
+
     /* Upcoming */
     .upcoming-item {
         display: flex; align-items: center; gap: 10px;
@@ -303,6 +352,26 @@
         background: #FEF3C7; color: #D97706;
         white-space: nowrap;
     }
+
+    .insights-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 16px;
+        margin: 0 0 20px;
+    }
+    @media (max-width: 900px) { .insights-grid { grid-template-columns: 1fr; } }
+    .insight-card {
+        background: #fff;
+        border: 1px solid #EEECEA;
+        border-radius: 14px;
+        padding: 18px;
+    }
+    .insight-label { font-size: 11px; color: #8B8FA8; letter-spacing: 1.4px; text-transform: uppercase; margin-bottom: 8px; }
+    .insight-value { font-size: 28px; font-weight: 700; color: #1A1A2E; line-height: 1; }
+    .insight-note { margin-top: 8px; font-size: 12px; color: #6B7280; line-height: 1.5; }
+    .insight-note.good { color: #059669; }
+    .insight-note.warn { color: #D97706; }
+    .insight-note.bad { color: #DC2626; }
 </style>
 
 {{-- ══ HERO ══ --}}
@@ -311,10 +380,40 @@
         <div class="hero-eyebrow">Dashboard Gestionnaire</div>
         <div class="hero-title">Bonjour, {{ explode(' ', auth()->user()->name)[0] }} 👋</div>
         <div class="hero-sub">Voici un aperçu de votre portefeuille immobilier.</div>
+        <div class="hero-meta">
+            <span class="hero-pill">{{ $buildings }} immeuble(s)</span>
+            <span class="hero-pill">{{ $apartments }} appartement(s)</span>
+            <span class="hero-pill">{{ $tenants }} locataire(s)</span>
+            <span class="hero-pill">{{ $ticketsCount ?? 0 }} ticket(s)</span>
+        </div>
     </div>
     <div class="hero-date">
         <div class="hero-date-day">{{ now()->format('d') }}</div>
         <div class="hero-date-info">{{ now()->translatedFormat('F Y') }}</div>
+    </div>
+</div>
+
+<div class="insights-grid">
+    <div class="insight-card">
+        <div class="insight-label">Occupation</div>
+        <div class="insight-value">{{ $occupancyRate }}%</div>
+        <div class="insight-note {{ $occupancyRate >= 80 ? 'good' : ($occupancyRate >= 50 ? 'warn' : 'bad') }}">
+            {{ $occupiedCount }} occupé(s), {{ $vacantCount }} vacant(s), {{ $worksCount }} en travaux
+        </div>
+    </div>
+    <div class="insight-card">
+        <div class="insight-label">Encaissement</div>
+        <div class="insight-value">{{ $collectionRate }}%</div>
+        <div class="insight-note {{ $collectionRate >= 80 ? 'good' : 'warn' }}">
+            {{ number_format($paidPayments, 0, ',', ' ') }} FCFA encaissés sur {{ number_format($payments, 0, ',', ' ') }} FCFA
+        </div>
+    </div>
+    <div class="insight-card">
+        <div class="insight-label">Loyers à venir</div>
+        <div class="insight-value">{{ $upcomingRentCount ?? 0 }}</div>
+        <div class="insight-note warn">
+            {{ number_format($upcomingRentAmount ?? 0, 0, ',', ' ') }} FCFA à suivre sur les prochains loyers
+        </div>
     </div>
 </div>
 
@@ -328,7 +427,7 @@
                         d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5"/>
                 </svg>
             </div>
-            <span class="stat-trend neu">—</span>
+            <span class="stat-trend neu">{{ $buildings > 0 ? 'Actif' : 'Vide' }}</span>
         </div>
         <div class="stat-val">{{ $buildings }}</div>
         <div class="stat-lbl">Immeubles</div>
@@ -342,7 +441,7 @@
                         d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
                 </svg>
             </div>
-            <span class="stat-trend neu">—</span>
+            <span class="stat-trend neu">{{ $apartments > 0 ? 'Suivi' : 'Vide' }}</span>
         </div>
         <div class="stat-val">{{ $apartments }}</div>
         <div class="stat-lbl">Appartements</div>
@@ -356,7 +455,7 @@
                         d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
                 </svg>
             </div>
-            <span class="stat-trend neu">—</span>
+            <span class="stat-trend neu">{{ $tenants > 0 ? 'Actif' : 'Vide' }}</span>
         </div>
         <div class="stat-val">{{ $tenants }}</div>
         <div class="stat-lbl">Locataires</div>
@@ -370,7 +469,7 @@
                         d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                 </svg>
             </div>
-            <span class="stat-trend up">↑</span>
+            <span class="stat-trend {{ $collectionRate >= 80 ? 'up' : ($collectionRate >= 50 ? 'neu' : 'down') }}">{{ $collectionRate }}%</span>
         </div>
         <div class="stat-val small">{{ number_format($payments / 1000, 0) }}k</div>
         <div class="stat-lbl">FCFA encaissés</div>
@@ -494,9 +593,7 @@
                 @php
                     $months = collect(range(5, 0))->map(fn($i) => [
                         'label' => now()->subMonths($i)->translatedFormat('M'),
-                        'value' => isset($monthlyPayments) && isset($monthlyPayments[$i])
-                            ? $monthlyPayments[$i]
-                            : rand(50000, 300000), // placeholder
+                        'value' => $monthlyPayments[$i] ?? 0,
                     ]);
                     $maxVal = $months->max('value') ?: 1;
                 @endphp
@@ -514,6 +611,41 @@
                 <div style="margin-top:10px;font-size:11px;color:#8B8FA8;text-align:right;">
                     Total : <strong style="color:#1A1A2E;">{{ number_format($payments, 0, ',', ' ') }} FCFA</strong>
                 </div>
+            </div>
+        </div>
+
+        {{-- Tickets récents --}}
+        <div class="card">
+            <div class="card-head">
+                <div class="card-head-left">
+                    <div class="card-icon">
+                        <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7h16M4 12h16M4 17h10"/>
+                        </svg>
+                    </div>
+                    <span class="card-title">Tickets récents</span>
+                </div>
+                @if(Route::has('manager.tickets.index'))
+                    <a href="{{ route('manager.tickets.index') }}" class="card-link">Voir tout →</a>
+                @endif
+            </div>
+            <div class="side-body">
+                @if(isset($recentTickets) && $recentTickets->count())
+                    @foreach($recentTickets as $ticket)
+                        <div class="ticket-item">
+                            <div class="ticket-dot" style="background:{{ $ticket->status === 'closed' ? '#10B981' : ($ticket->status === 'in_progress' ? '#F59E0B' : '#EF4444') }};"></div>
+                            <div class="ticket-main">
+                                <div class="ticket-title">Appt. {{ optional($ticket->apartment)->number ?? '—' }} · {{ optional($ticket->apartment)->building->name ?? 'Bâtiment' }}</div>
+                                <div class="ticket-desc">{{ \Illuminate\Support\Str::limit($ticket->description, 72) }}</div>
+                            </div>
+                            <span class="ticket-status {{ $ticket->status }}">{{ $ticket->status }}</span>
+                        </div>
+                    @endforeach
+                @else
+                    <div style="padding:20px 16px;text-align:center;font-size:12px;color:#8B8FA8;">
+                        Aucun ticket récent.
+                    </div>
+                @endif
             </div>
         </div>
 

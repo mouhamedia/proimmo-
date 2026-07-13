@@ -97,6 +97,18 @@ class User extends Authenticatable
         return $this->hasMany(Ticket::class, 'tenant_id');
     }
 
+    // Messages envoyés
+    public function sentMessages()
+    {
+        return $this->hasMany(Message::class, 'sender_id');
+    }
+
+    // Messages reçus
+    public function receivedMessages()
+    {
+        return $this->hasMany(Message::class, 'recipient_id');
+    }
+
     // Un technicien a plusieurs tickets
     public function assignedTickets()
     {

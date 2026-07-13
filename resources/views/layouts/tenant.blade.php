@@ -77,14 +77,36 @@
 
         .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 150; }
         .sidebar-overlay.show { display: block; }
+        .page-content > * { max-width: 100%; }
 
         @media (max-width: 900px) {
-            .sidebar { transform: translateX(-100%); transition: transform 0.28s cubic-bezier(.4,0,.2,1); }
+            .sidebar {
+                width: min(86vw, 320px);
+                transform: translateX(-100%);
+                transition: transform 0.28s cubic-bezier(.4,0,.2,1);
+                box-shadow: 0 18px 40px rgba(0,0,0,0.25);
+            }
             .sidebar.open { transform: translateX(0); }
             .main-wrapper { margin-left: 0; }
-            .topbar { padding: 0 16px; }
-            .page-content { padding: 20px 16px; }
+            .topbar {
+                height: auto;
+                min-height: 60px;
+                padding: 12px 16px;
+                gap: 12px;
+                align-items: flex-start;
+                flex-wrap: wrap;
+            }
+            .topbar-left { width: 100%; align-items: flex-start; }
+            .topbar-right { margin-left: auto; }
+            .page-content { padding: 18px 14px 22px; }
             .mobile-menu-btn { display: flex !important; }
+            .nav-item { font-size: 14px; padding: 11px 12px; }
+        }
+        @media (max-width: 640px) {
+            .brand-name { font-size: 18px; }
+            .brand-tagline { padding-left: 46px; letter-spacing: 1.5px; }
+            .topbar-right { width: 100%; justify-content: flex-end; }
+            .page-content { padding: 16px 12px 20px; }
         }
         .mobile-menu-btn { display: none; }
         ::-webkit-scrollbar { width: 5px; height: 5px; }
@@ -131,6 +153,15 @@
                         d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
                 </svg>
                 Mes paiements
+            </a>
+
+            <a href="{{ Route::has('messages.index') ? route('messages.index') : '#' }}"
+               class="nav-item {{ request()->routeIs('messages.*') ? 'active' : '' }}">
+                <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+                        d="M7 8h10M7 12h6m-9 8l3-3h10a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                </svg>
+                Messagerie
             </a>
         </nav>
 

@@ -3,11 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\AccessCodeController;
-use App\Http\Controllers\Manager\ApartmentController;
-use App\Http\Controllers\Manager\BuildingController;
-use App\Http\Controllers\Manager\TenantController;
-use App\Http\Controllers\Manager\MaintenanceWorkerController;
-use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\MessageController;
 
 // Page d'accueil
 Route::get('/', function () {
@@ -19,25 +15,18 @@ Route::get('/register', [App\Http\Controllers\Auth\RegisterController::class, 's
 Route::post('/register', [App\Http\Controllers\Auth\RegisterController::class, 'register']);
 Route::get('/login', [App\Http\Controllers\Auth\LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [App\Http\Controllers\Auth\LoginController::class, 'login']);
+Route::get('/logout', function () {
+    Auth::logout();
+    request()->session()->invalidate();
+    request()->session()->regenerateToken();
+    return redirect('/');
+});
 Route::post('/logout', function () {
     Auth::logout();
     request()->session()->invalidate();
     request()->session()->regenerateToken();
     return redirect('/');
 })->name('logout');
-
-// Accès locataire/maintenancier par code
-Route::get('/acces-code', [AccessCodeController::class, 'showForm'])->name('code.form');
-Route::post('/acces-code', [AccessCodeController::class, 'submitCode'])->name('code.access');
-
-// Gestion des immeubles, appartements, locataires et maintenanciers pour le manager
-Route::middleware(['auth'])->prefix('manager')->name('manager.')->group(function () {
-    Route::resource('buildings', App\Http\Controllers\Manager\BuildingController::class);
-    Route::resource('apartments', App\Http\Controllers\Manager\ApartmentController::class);
-    Route::resource('tenants', App\Http\Controllers\Manager\TenantController::class);
-    Route::resource('maintenance_workers', App\Http\Controllers\Manager\MaintenanceWorkerController::class);
-    Route::get('dashboard', [App\Http\Controllers\Manager\DashboardController::class, 'index'])->name('dashboard');
-});
 
 // Debug : affiche le token CSRF et la session
 Route::get('/debug-csrf', function () {
@@ -49,6 +38,10 @@ Route::get('/debug-csrf', function () {
         'cookies' => request()->cookies->all(),
     ];
 })->middleware('web');
+
+// Accès locataire/maintenancier par code
+Route::get('/acces-code', [AccessCodeController::class, 'showForm'])->name('code.form');
+Route::post('/acces-code', [AccessCodeController::class, 'submitCode'])->name('code.access');
 
 // Debug : force la création de la session et affiche le cookie
 Route::get('/debug-session-set', function () {
@@ -72,4 +65,9 @@ Route::get('code-login', function() {
     return view('auth.code_login');
 })->name('code.login.view');
 Route::post('code-login', [App\Http\Controllers\Auth\CodeLoginController::class, 'login'])->name('code.login.submit');
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/messages/{user?}', [MessageController::class, 'index'])->name('messages.index');
+    Route::post('/messages', [MessageController::class, 'store'])->name('messages.store');
+});
 
